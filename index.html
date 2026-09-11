@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MY Institute – Exam System</title>
+  <title>MY Institute – Exam Portal</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Amiri:wght@400;700&display=swap" rel="stylesheet"/>
-  <!-- jsPDF for client-side PDF generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root{
@@ -18,49 +17,30 @@
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
-
-    /* HEADER */
-    .header{background:#FFFFFF;border-bottom:2px solid var(--border);padding:14px 24px;box-shadow:0 2px 12px rgba(21,101,192,0.08);
-      display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+    .header{background:#FFFFFF;border-bottom:2px solid var(--border);padding:14px 24px;box-shadow:0 2px 12px rgba(21,101,192,0.08);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
     .logo-area{display:flex;align-items:center;gap:12px}
     .logo-area img{height:44px;width:44px;object-fit:contain;border-radius:6px}
     .logo-text{font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:var(--gold-light);letter-spacing:1px}
     .logo-sub{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
     .header-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    .user-badge{background:var(--card);border:1px solid var(--border);border-radius:20px;
-      padding:6px 14px;font-size:13px;color:var(--gold-light)}
-    .btn-sm{background:transparent;border:1px solid var(--border);color:var(--muted);
-      padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;transition:all .2s}
+    .user-badge{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;color:var(--gold-light)}
+    .btn-sm{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;transition:all .2s}
     .btn-sm:hover{border-color:var(--gold);color:var(--gold)}
-
-    /* PAGES */
     .page{display:none}.page.active{display:block}
-
-    /* AUTH */
-    .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;
-      padding:24px;background:linear-gradient(135deg,#EAF4FF 0%,#E0F7FA 50%,#E8F8F0 100%)}
-    .auth-card{background:#FFFFFF;border:2px solid var(--border);border-radius:20px;
-      padding:48px 40px;width:100%;max-width:400px;text-align:center;box-shadow:0 8px 40px rgba(21,101,192,0.15)}
+    .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#EAF4FF 0%,#E0F7FA 50%,#E8F8F0 100%)}
+    .auth-card{background:#FFFFFF;border:2px solid var(--border);border-radius:20px;padding:48px 40px;width:100%;max-width:400px;text-align:center;box-shadow:0 8px 40px rgba(21,101,192,0.15)}
     .auth-logo{height:80px;margin-bottom:16px}
     .auth-title{font-family:'Cinzel',serif;font-size:22px;color:var(--gold);margin-bottom:4px}
     .auth-sub{font-size:13px;color:var(--muted);margin-bottom:32px}
-
-    /* FIELDS & BTNS */
     .field{margin-bottom:16px;text-align:left}
-    .field label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;
-      display:block;margin-bottom:6px}
-    .field input,.field select,.field textarea{width:100%;background:#F5FAFF;border:2px solid var(--border);
-      border-radius:var(--radius);padding:12px 14px;color:var(--text);font-size:14px;
-      font-family:'Inter',sans-serif;transition:all .2s}
+    .field label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px}
+    .field input,.field select,.field textarea{width:100%;background:#F5FAFF;border:2px solid var(--border);border-radius:var(--radius);padding:12px 14px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;transition:all .2s}
     .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold)}
     .field textarea{resize:vertical;min-height:80px}
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
-      padding:12px 24px;border-radius:var(--radius);font-size:14px;font-weight:500;
-      cursor:pointer;transition:all .2s;border:none;font-family:'Inter',sans-serif}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;border:none;font-family:'Inter',sans-serif}
     .btn-primary{background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 55%,var(--accent) 100%);color:var(--black);width:100%}
     .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
     .btn-danger{background:var(--danger);color:#fff}
-    .btn-danger:hover{opacity:.85}
     .btn-outline{background:transparent;border:1px solid var(--gold);color:var(--gold)}
     .btn-outline:hover{background:var(--gold);color:var(--black)}
     .btn-ghost{background:var(--card);border:1px solid var(--border);color:var(--text)}
@@ -68,40 +48,27 @@
     .btn-success{background:var(--success);color:#fff}
     .btn-wa{background:#25D366;color:#fff}
     .btn-wa:hover{opacity:.9}
-
-    /* CONTAINER & TABS */
     .container{max-width:1200px;margin:0 auto;padding:32px 24px}
-    .tabs{display:flex;gap:4px;background:#E9F5FB;border:2px solid var(--border);
-      border-radius:10px;padding:4px;margin-bottom:28px;width:fit-content;flex-wrap:wrap}
-    .tab{padding:8px 18px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;
-      color:var(--muted);background:transparent;border:none;transition:all .2s;font-family:'Inter',sans-serif}
+    .tabs{display:flex;gap:4px;background:#E9F5FB;border:2px solid var(--border);border-radius:10px;padding:4px;margin-bottom:28px;width:fit-content;flex-wrap:wrap}
+    .tab{padding:8px 18px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;color:var(--muted);background:transparent;border:none;transition:all .2s;font-family:'Inter',sans-serif}
     .tab.active{background:linear-gradient(135deg,var(--gold) 0%,var(--gold-light) 55%,var(--accent) 100%);color:var(--black)}
     .tab:not(.active):hover{color:var(--text)}
-
-    /* LEADERBOARD */
-    .leaderboard-section{background:linear-gradient(135deg,#FFFDF0 0%,#FFFFFF 100%);border:2px solid var(--border);
-      border-radius:18px;padding:24px;margin-bottom:32px;box-shadow:0 4px 20px rgba(21,101,192,0.10)}
-    .section-title{font-family:'Cinzel',serif;font-size:16px;color:var(--gold-light);
-      margin-bottom:20px;display:flex;align-items:center;gap:10px}
-    .lb-row{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:12px;
-      margin-bottom:8px;background:#EFF8FF;border:2px solid transparent;transition:all .2s}
+    .leaderboard-section{background:linear-gradient(135deg,#FFFDF0 0%,#FFFFFF 100%);border:2px solid var(--border);border-radius:18px;padding:24px;margin-bottom:32px;box-shadow:0 4px 20px rgba(21,101,192,0.10)}
+    .section-title{font-family:'Cinzel',serif;font-size:16px;color:var(--gold-light);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+    .lb-row{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:12px;margin-bottom:8px;background:#EFF8FF;border:2px solid transparent;transition:all .2s}
     .lb-row:hover{border-color:var(--border)}
     .lb-row.top1{border-color:#FFD700;background:linear-gradient(135deg,rgba(255,215,0,.08) 0%,transparent 100%)}
     .lb-row.top2{border-color:#C0C0C0;background:linear-gradient(135deg,rgba(192,192,192,.06) 0%,transparent 100%)}
     .lb-row.top3{border-color:#CD7F32;background:linear-gradient(135deg,rgba(205,127,50,.06) 0%,transparent 100%)}
     .lb-rank{font-family:'Cinzel',serif;font-size:20px;font-weight:700;min-width:36px;text-align:center}
     .rank-1{color:#FFD700}.rank-2{color:#C0C0C0}.rank-3{color:#CD7F32}.rank-other{color:var(--muted);font-size:15px}
-    .lb-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;
-      justify-content:center;font-weight:600;font-size:15px;flex-shrink:0}
+    .lb-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;flex-shrink:0}
     .lb-name{flex:1;font-weight:500;font-size:14px}
     .lb-score{font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:var(--gold-light)}
-
-    /* CARDS & STATS */
     .grid{display:grid;gap:16px}
     .grid-2{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
     .grid-3{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
-    .card{background:#FFFFFF;border:2px solid var(--border);border-radius:16px;
-      padding:22px;transition:all .2s;box-shadow:0 2px 12px rgba(21,101,192,0.07)}
+    .card{background:#FFFFFF;border:2px solid var(--border);border-radius:16px;padding:22px;transition:all .2s;box-shadow:0 2px 12px rgba(21,101,192,0.07)}
     .card:hover{border-color:var(--gold-light);transform:translateY(-3px);box-shadow:0 8px 24px rgba(21,101,192,0.15)}
     .card-title{font-weight:600;font-size:15px;margin-bottom:8px}
     .card-meta{font-size:12px;color:var(--muted);margin-bottom:14px}
@@ -114,123 +81,95 @@
     .badge-draft{background:rgba(136,136,136,.15);color:var(--muted);border:1px solid var(--border)}
     .badge-discount{background:rgba(21,101,192,.15);color:var(--gold-light);border:1px solid var(--gold)}
     .badge-sched{background:rgba(41,128,185,.15);color:#5dade2;border:1px solid #2980b9}
-
-    /* EXAM AREA */
+    .badge-pending{background:rgba(41,128,185,.15);color:#2980b9;border:1px solid #2980b9}
+    .badge-manual{background:rgba(155,89,182,.15);color:#8e44ad;border:1px solid #8e44ad}
     .exam-wrap{max-width:760px;margin:0 auto;padding:32px 24px}
-    .exam-header{background:#FFFFFF;border:2px solid var(--border);border-radius:16px;box-shadow:0 2px 12px rgba(21,101,192,0.08);
-      padding:20px 24px;display:flex;align-items:center;justify-content:space-between;
-      margin-bottom:24px;flex-wrap:wrap;gap:12px}
+    .exam-header{background:#FFFFFF;border:2px solid var(--border);border-radius:16px;box-shadow:0 2px 12px rgba(21,101,192,0.08);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
     .exam-title-area .name{font-family:'Cinzel',serif;font-size:18px;color:var(--gold-light)}
     .exam-title-area .sub{font-size:12px;color:var(--muted);margin-top:2px}
-    .timer-box{background:var(--dark);border:2px solid var(--gold);border-radius:10px;
-      padding:10px 20px;text-align:center}
+    .timer-box{background:var(--dark);border:2px solid var(--gold);border-radius:10px;padding:10px 20px;text-align:center}
     .timer-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
-    .timer-val{font-family:'Cinzel',serif;font-size:24px;font-weight:700;color:var(--gold-light);
-      font-variant-numeric:tabular-nums}
+    .timer-val{font-family:'Cinzel',serif;font-size:24px;font-weight:700;color:var(--gold-light);font-variant-numeric:tabular-nums}
     .timer-box.warning{border-color:var(--danger)}.timer-box.warning .timer-val{color:var(--danger)}
     .progress-bar{height:4px;background:var(--border);border-radius:2px;margin-bottom:28px;overflow:hidden}
-    .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold) 0%,var(--gold-light) 100%);
-      border-radius:2px;transition:width .3s}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold) 0%,var(--gold-light) 100%);border-radius:2px;transition:width .3s}
     .question-card{background:#FFFFFF;border:2px solid var(--border);border-radius:16px;padding:28px;margin-bottom:16px;box-shadow:0 2px 12px rgba(21,101,192,0.07)}
     .question-num{font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
     .question-text{font-size:17px;line-height:1.6;margin-bottom:22px}
     .options{display:grid;gap:10px}
-    .option{display:flex;align-items:center;gap:14px;padding:14px 18px;background:#F5FAFF;
-      border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-size:14px}
+    .option{display:flex;align-items:center;gap:14px;padding:14px 18px;background:#F5FAFF;border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;font-size:14px}
     .option:hover{border-color:var(--gold)}
     .option.selected{border-color:var(--gold-light);background:rgba(21,101,192,.1)}
     .option.correct{border-color:var(--success);background:rgba(39,174,96,.1)}
     .option.wrong{border-color:var(--danger);background:rgba(192,57,43,.1)}
-    .option-letter{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);
-      display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;
-      flex-shrink:0;transition:all .2s}
+    .option-letter{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;flex-shrink:0;transition:all .2s}
     .option.selected .option-letter{background:var(--gold);border-color:var(--gold);color:var(--black)}
     .option.correct .option-letter{background:var(--success);border-color:var(--success);color:#fff}
     .option.wrong .option-letter{background:var(--danger);border-color:var(--danger);color:#fff}
     .exam-nav{display:flex;gap:12px;justify-content:space-between;margin-top:24px;flex-wrap:wrap}
-
-    /* RESULT */
-    .result-card{background:#FFFFFF;border:2px solid var(--border);border-radius:20px;
-      padding:40px;text-align:center;max-width:520px;margin:0 auto;box-shadow:0 8px 32px rgba(21,101,192,0.12)}
-    .result-score-ring{width:140px;height:140px;border-radius:50%;border:6px solid var(--gold);
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      margin:0 auto 24px;background:radial-gradient(circle,rgba(21,101,192,.1) 0%,transparent 70%)}
+    .result-card{background:#FFFFFF;border:2px solid var(--border);border-radius:20px;padding:40px;text-align:center;max-width:520px;margin:0 auto;box-shadow:0 8px 32px rgba(21,101,192,0.12)}
+    .result-score-ring{width:140px;height:140px;border-radius:50%;border:6px solid var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 24px;background:radial-gradient(circle,rgba(21,101,192,.1) 0%,transparent 70%)}
     .result-score-num{font-family:'Cinzel',serif;font-size:36px;font-weight:700;color:var(--gold-light)}
     .result-score-label{font-size:11px;color:var(--muted)}
     .result-grade{font-family:'Cinzel',serif;font-size:22px;margin-bottom:8px}
-    .discount-reveal{background:linear-gradient(135deg,rgba(21,101,192,.2) 0%,rgba(21,101,192,.05) 100%);
-      border:1px solid var(--gold);border-radius:12px;padding:18px;margin-top:20px}
-    .discount-code{font-family:'Cinzel',serif;font-size:24px;color:var(--gold-light);
-      letter-spacing:4px;margin:8px 0}
-
-    /* SCHEDULE */
-    .schedule-badge-open{background:rgba(39,174,96,.15);color:var(--success);border:1px solid var(--success);
-      padding:3px 10px;border-radius:20px;font-size:11px}
-    .schedule-badge-upcoming{background:rgba(41,128,185,.15);color:#5dade2;border:1px solid #2980b9;
-      padding:3px 10px;border-radius:20px;font-size:11px}
-    .schedule-badge-ended{background:rgba(136,136,136,.15);color:var(--muted);border:1px solid var(--border);
-      padding:3px 10px;border-radius:20px;font-size:11px}
-    .countdown-chip{background:var(--dark);border:1px solid var(--border);border-radius:8px;
-      padding:6px 12px;font-family:'Cinzel',serif;font-size:12px;color:var(--gold-light)}
-
-    /* MODAL */
-    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);
-      z-index:1000;align-items:center;justify-content:center;padding:20px}
+    .discount-reveal{background:linear-gradient(135deg,rgba(21,101,192,.2) 0%,rgba(21,101,192,.05) 100%);border:1px solid var(--gold);border-radius:12px;padding:18px;margin-top:20px}
+    .discount-code{font-family:'Cinzel',serif;font-size:24px;color:var(--gold-light);letter-spacing:4px;margin:8px 0}
+    .schedule-badge-open{background:rgba(39,174,96,.15);color:var(--success);border:1px solid var(--success);padding:3px 10px;border-radius:20px;font-size:11px}
+    .schedule-badge-upcoming{background:rgba(41,128,185,.15);color:#5dade2;border:1px solid #2980b9;padding:3px 10px;border-radius:20px;font-size:11px}
+    .schedule-badge-ended{background:rgba(136,136,136,.15);color:var(--muted);border:1px solid var(--border);padding:3px 10px;border-radius:20px;font-size:11px}
+    .countdown-chip{background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-family:'Cinzel',serif;font-size:12px;color:var(--gold-light)}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;padding:20px}
     .modal-overlay.open{display:flex}
-    .modal{background:#FFFFFF;border:2px solid var(--border);border-radius:20px;
-      padding:32px;width:100%;max-width:580px;max-height:88vh;overflow-y:auto}
-    .modal-title{font-family:'Cinzel',serif;font-size:18px;color:var(--gold-light);
-      margin-bottom:24px;display:flex;align-items:center;justify-content:space-between}
+    .modal{background:#FFFFFF;border:2px solid var(--border);border-radius:20px;padding:32px;width:100%;max-width:580px;max-height:88vh;overflow-y:auto}
+    .modal-title{font-family:'Cinzel',serif;font-size:18px;color:var(--gold-light);margin-bottom:24px;display:flex;align-items:center;justify-content:space-between}
     .close-btn{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer}
     .close-btn:hover{color:var(--text)}
     .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;flex-wrap:wrap}
-
-    /* MCQ BUILDER */
-    .question-builder{background:#EFF8FF;border:2px solid var(--border);border-radius:12px;
-      padding:18px;margin-bottom:12px;position:relative}
+    .question-builder{background:#EFF8FF;border:2px solid var(--border);border-radius:12px;padding:18px;margin-bottom:12px;position:relative}
     .question-builder .q-num{font-size:11px;color:var(--gold);margin-bottom:10px;font-weight:600;text-transform:uppercase}
     .option-input{display:flex;gap:8px;margin-bottom:8px;align-items:center}
     .option-input label{font-size:12px;color:var(--muted);min-width:20px}
     .option-input input[type="radio"]{accent-color:var(--gold-light)}
-    .option-input input[type="text"]{flex:1;background:#FFFFFF;border:2px solid var(--border);
-      border-radius:6px;padding:8px 10px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif}
+    .option-input input[type="text"]{flex:1;background:#FFFFFF;border:2px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-size:13px;font-family:'Inter',sans-serif}
     .option-input input[type="text"]:focus{outline:none;border-color:var(--gold)}
-    .del-q-btn{position:absolute;top:12px;right:12px;background:rgba(192,57,43,.15);
-      border:1px solid var(--danger);color:var(--danger);border-radius:6px;padding:4px 8px;
-      font-size:12px;cursor:pointer}
-    .add-q-btn{width:100%;padding:12px;border:2px dashed var(--border);border-radius:10px;
-      background:transparent;color:var(--muted);font-size:14px;cursor:pointer;margin-top:4px;
-      transition:all .2s;font-family:'Inter',sans-serif}
+    .del-q-btn{position:absolute;top:12px;right:12px;background:rgba(192,57,43,.15);border:1px solid var(--danger);color:var(--danger);border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer}
+    .add-q-btn{width:100%;padding:12px;border:2px dashed var(--border);border-radius:10px;background:transparent;color:var(--muted);font-size:14px;cursor:pointer;margin-top:4px;transition:all .2s;font-family:'Inter',sans-serif}
     .add-q-btn:hover{border-color:var(--gold);color:var(--gold)}
-
-    /* TABLE */
     table{width:100%;border-collapse:collapse;font-size:13px}
-    th{background:#E9F5FB;color:var(--muted);font-weight:600;text-align:left;
-      padding:10px 14px;text-transform:uppercase;font-size:11px;letter-spacing:.5px}
+    th{background:#E9F5FB;color:var(--muted);font-weight:600;text-align:left;padding:10px 14px;text-transform:uppercase;font-size:11px;letter-spacing:.5px}
     td{padding:12px 14px;border-bottom:1px solid var(--border)}
     tr:last-child td{border-bottom:none}
     tr:hover td{background:rgba(255,255,255,.02)}
-    .table-wrap{background:#FFFFFF;border:2px solid var(--border);border-radius:16px;
-      overflow:hidden;overflow-x:auto}
-
-    /* ALERTS */
+    .table-wrap{background:#FFFFFF;border:2px solid var(--border);border-radius:16px;overflow:hidden;overflow-x:auto}
     .alert{padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:16px}
     .alert-error{background:rgba(192,57,43,.15);border:1px solid var(--danger);color:#e57373}
     .alert-success{background:rgba(39,174,96,.15);border:1px solid var(--success);color:#6fcf97}
     .alert-info{background:rgba(21,101,192,.12);border:1px solid var(--gold);color:var(--gold-pale)}
-
-    /* LOADING */
-    .spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--gold);
-      border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+    .spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .loading-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;
-      align-items:center;justify-content:center;z-index:2000}
+    .loading-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:2000}
     .loading-overlay.show{display:flex}
-
-    /* CERT PREVIEW */
-    .cert-preview-modal .modal{max-width:760px}
-
-    /* MISC */
+    .bank-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+    .bank-filters select,.bank-filters input{background:#F5FAFF;border:2px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif}
+    .bank-card{background:#FFFFFF;border:2px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;transition:all .2s}
+    .bank-card:hover{border-color:var(--gold-light)}
+    .bank-card .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+    .tag-pill{font-size:11px;padding:2px 10px;border-radius:20px;border:1px solid var(--border);color:var(--muted)}
+    .tag-subject{border-color:var(--blue);color:var(--blue)}
+    .tag-level{border-color:var(--accent);color:var(--accent)}
+    .tag-points{border-color:var(--gold);color:var(--gold-light)}
+    .bank-pick-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:2px solid var(--border);border-radius:10px;margin-bottom:8px;background:#F5FAFF;cursor:pointer}
+    .bank-pick-row:hover{border-color:var(--gold)}
+    .bank-pick-row input[type=checkbox]{margin-top:3px;accent-color:var(--gold-light)}
+    .student-pick-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;max-height:200px;overflow-y:auto;border:2px solid var(--border);border-radius:10px;padding:10px;background:#F5FAFF}
+    .student-pick-item{display:flex;align-items:center;gap:8px;font-size:13px}
+    .student-pick-item input{accent-color:var(--gold-light)}
+    .q-img-preview{max-width:160px;max-height:100px;border-radius:8px;border:1px solid var(--border);margin-top:6px;display:block}
+    .points-chip{font-family:'Cinzel',serif;font-size:11px;color:var(--gold-light);background:rgba(21,101,192,.1);border:1px solid var(--gold);border-radius:20px;padding:2px 10px;display:inline-block;margin-bottom:10px}
+    .audio-record-box{border:2px dashed var(--border);border-radius:10px;padding:16px;text-align:center}
+    .audio-record-box.recording{border-color:var(--danger);background:rgba(192,57,43,.05)}
+    .notif-banner{background:linear-gradient(135deg,rgba(21,101,192,.18) 0%,rgba(21,101,192,.05) 100%);border:2px solid var(--gold);border-radius:14px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .pending-note{background:rgba(41,128,185,.1);border:1px solid #2980b9;border-radius:10px;padding:14px;font-size:13px;color:#2980b9;margin-top:10px}
     .flex{display:flex}.gap-10{gap:10px}.gap-16{gap:16px}
     .mt-16{margin-top:16px}.mt-24{margin-top:24px}.mb-16{margin-bottom:16px}.mb-24{margin-bottom:24px}
     .text-gold{color:var(--gold-light)}.text-muted{color:var(--muted);font-size:13px}
@@ -238,42 +177,10 @@
     .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
     .empty-state{text-align:center;padding:48px 24px;color:var(--muted)}
     .empty-state .icon{font-size:48px;margin-bottom:12px}
-    .wa-msg-box{background:#F0FFF4;border:2px solid #A8D5B5;border-radius:10px;
-      padding:14px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;
-      color:var(--text);max-height:200px;overflow-y:auto}
-    .gift-tag{font-size:11px;background:rgba(21,101,192,.15);border:1px solid var(--gold);
-      color:var(--gold-light);padding:2px 8px;border-radius:20px;margin-left:6px}
-
-    /* QUESTION BANK & NEW FEATURES */
-    .badge-pending{background:rgba(41,128,185,.15);color:#2980b9;border:1px solid #2980b9}
-    .badge-manual{background:rgba(155,89,182,.15);color:#8e44ad;border:1px solid #8e44ad}
-    .bank-filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
-    .bank-filters select,.bank-filters input{background:#F5FAFF;border:2px solid var(--border);
-      border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text);font-family:'Inter',sans-serif}
-    .bank-card{background:#FFFFFF;border:2px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px}
-    .bank-card .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
-    .tag-pill{font-size:11px;padding:2px 10px;border-radius:20px;border:1px solid var(--border);color:var(--muted)}
-    .tag-subject{border-color:var(--blue);color:var(--blue)}
-    .tag-level{border-color:var(--accent);color:var(--accent)}
-    .tag-points{border-color:var(--gold);color:var(--gold-light)}
-    .bank-pick-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:2px solid var(--border);
-      border-radius:10px;margin-bottom:8px;background:#F5FAFF;cursor:pointer}
-    .bank-pick-row:hover{border-color:var(--gold)}
-    .bank-pick-row input[type=checkbox]{margin-top:3px;accent-color:var(--gold-light)}
-    .student-pick-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;
-      max-height:200px;overflow-y:auto;border:2px solid var(--border);border-radius:10px;padding:10px;background:#F5FAFF}
-    .student-pick-item{display:flex;align-items:center;gap:8px;font-size:13px}
-    .student-pick-item input{accent-color:var(--gold-light)}
-    .q-img-preview{max-width:160px;max-height:100px;border-radius:8px;border:1px solid var(--border);margin-top:6px;display:block}
-    .points-chip{font-family:'Cinzel',serif;font-size:11px;color:var(--gold-light);background:rgba(21,101,192,.1);
-      border:1px solid var(--gold);border-radius:20px;padding:2px 10px;display:inline-block;margin-bottom:10px}
-    .audio-record-box{border:2px dashed var(--border);border-radius:10px;padding:16px;text-align:center}
-    .audio-record-box.recording{border-color:var(--danger)}
-    .notif-banner{background:linear-gradient(135deg,rgba(21,101,192,.18) 0%,rgba(21,101,192,.05) 100%);
-      border:2px solid var(--gold);border-radius:14px;padding:14px 18px;margin-bottom:16px;
-      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-    .pending-note{background:rgba(41,128,185,.1);border:1px solid #2980b9;border-radius:10px;padding:14px;font-size:13px;color:#2980b9;margin-top:10px}
-
+    .wa-msg-box{background:#F0FFF4;border:2px solid #A8D5B5;border-radius:10px;padding:14px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:var(--text);max-height:200px;overflow-y:auto}
+    .gift-tag{font-size:11px;background:rgba(21,101,192,.15);border:1px solid var(--gold);color:var(--gold-light);padding:2px 8px;border-radius:20px;margin-left:6px}
+    /* Teacher role */
+    .teacher-badge{background:rgba(124,58,237,.15);border:1px solid var(--purple);color:var(--purple);padding:3px 10px;border-radius:20px;font-size:11px}
     @media(max-width:600px){
       .header{padding:10px 14px}.logo-text{font-size:14px}
       .container,.exam-wrap{padding:20px 14px}.auth-card{padding:32px 20px}
@@ -286,11 +193,23 @@
     ::-webkit-scrollbar-thumb:hover{background:var(--gold)}
     .fade-in{animation:fadeIn .3s ease}
     @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    /* home banner */
+    .home-banner{background:linear-gradient(135deg,#EAF4FF,#E0F7FA);border:2px solid var(--border);border-radius:18px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;gap:20px}
+    .home-banner-icon{font-size:48px}
+    .subject-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .chip{padding:4px 14px;border-radius:20px;font-size:12px;font-weight:500}
+    .chip-quran{background:rgba(21,101,192,.12);color:var(--gold-light);border:1px solid var(--gold)}
+    .chip-arabic{background:rgba(16,163,74,.12);color:var(--success);border:1px solid var(--success)}
+    .chip-islamic{background:rgba(124,58,237,.12);color:var(--purple);border:1px solid var(--purple)}
+    .tips-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:28px}
+    .tip-card{background:#fff;border:2px solid var(--border);border-radius:12px;padding:16px;display:flex;align-items:flex-start;gap:12px}
+    .tip-icon{font-size:22px;flex-shrink:0}
+    .tip-title{font-weight:600;font-size:13px;margin-bottom:4px}
+    .tip-desc{font-size:12px;color:var(--muted)}
   </style>
 </head>
 <body>
 
-<!-- LOADING -->
 <div class="loading-overlay" id="loadingOverlay">
   <div style="text-align:center">
     <div class="spinner" style="width:36px;height:36px;border-width:3px;margin:0 auto 12px"></div>
@@ -298,19 +217,13 @@
   </div>
 </div>
 
-<!-- ═══ PAGE: LOGIN ═══ -->
+<!-- LOGIN -->
 <div class="page active" id="page-login">
   <div class="auth-wrap">
     <div class="auth-card fade-in">
       <img src="logo.jpeg" class="auth-logo" alt="MY Institute" onerror="this.style.display='none'"/>
       <div class="auth-title">MY Institute</div>
       <div class="auth-sub">Exam & Learning Portal</div>
-      <div class="learn-icons">
-        <div class="learn-icon li-quran">📖</div>
-        <div class="learn-icon li-arabic">ع</div>
-        <div class="learn-icon li-star">⭐</div>
-        <div class="learn-icon li-book">🎓</div>
-      </div>
       <div id="loginAlert"></div>
       <div class="field"><label>Username</label><input type="text" id="loginUsername" placeholder="Enter username" autocomplete="username"/></div>
       <div class="field"><label>Password</label><input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password"/></div>
@@ -320,7 +233,7 @@
   </div>
 </div>
 
-<!-- ═══ PAGE: REGISTER INFO ═══ -->
+<!-- REGISTER INFO -->
 <div class="page" id="page-register">
   <div class="auth-wrap">
     <div class="auth-card fade-in">
@@ -342,16 +255,16 @@
     <div class="header-right">
       <div class="user-badge" id="headerUser">—</div>
       <button class="btn-sm" id="headerProfileBtn" onclick="showPage('page-profile')" style="display:none">👤 My Profile</button>
+      <button class="btn-sm" id="headerTeacherBtn" onclick="showPage('page-teacher')" style="display:none">📚 Teacher Panel</button>
       <button class="btn-sm" id="headerAdminBtn" onclick="showPage('page-admin')" style="display:none">⚙️ Admin</button>
       <button class="btn-sm" onclick="logout()">Sign Out</button>
     </div>
   </div>
 </div>
 
-<!-- ═══ PAGE: HOME ═══ -->
+<!-- HOME -->
 <div class="page" id="page-home">
   <div class="container fade-in">
-    <!-- Welcome Banner -->
     <div class="home-banner">
       <div class="home-banner-icon">🕌</div>
       <div style="flex:1">
@@ -370,48 +283,32 @@
         <div class="stat-box"><div class="stat-num" id="statStudents">0</div><div class="stat-label">Students</div></div>
         <div class="stat-box"><div class="stat-num" id="statExams">0</div><div class="stat-label">Exams</div></div>
         <div class="stat-box"><div class="stat-num" id="statAttempts">0</div><div class="stat-label">Attempts</div></div>
-        <div class="stat-box"><div class="stat-num" id="statDiscounts">0</div><div class="stat-label">Gifts Sent</div></div>
+        <div class="stat-box"><div class="stat-num" id="statBank">0</div><div class="stat-label">Bank Questions</div></div>
       </div>
     </div>
-    <!-- Leaderboard -->
     <div class="leaderboard-section">
       <div class="section-title"><span>🏆</span> Hall of Excellence — Top Students</div>
       <div id="leaderboardList"><div class="empty-state"><div class="icon">🎓</div><p>No results yet. Be the first!</p></div></div>
     </div>
-    <!-- Learning Tips (student) -->
     <div id="tipsRow" style="display:none">
       <div class="tips-row">
-        <div class="tip-card">
-          <div class="tip-icon">📖</div>
-          <div><div class="tip-title">Read carefully</div><div class="tip-desc">Take your time reading each question before answering</div></div>
-        </div>
-        <div class="tip-card">
-          <div class="tip-icon">⏱️</div>
-          <div><div class="tip-title">Watch the timer</div><div class="tip-desc">Keep an eye on remaining time and pace yourself</div></div>
-        </div>
-        <div class="tip-card">
-          <div class="tip-icon">🌟</div>
-          <div><div class="tip-title">Do your best</div><div class="tip-desc">Review your answers before submitting when possible</div></div>
-        </div>
-        <div class="tip-card">
-          <div class="tip-icon">🏆</div>
-          <div><div class="tip-title">Earn certificates</div><div class="tip-desc">Pass exams to earn your MY Institute certificate</div></div>
-        </div>
+        <div class="tip-card"><div class="tip-icon">📖</div><div><div class="tip-title">Read carefully</div><div class="tip-desc">Take your time reading each question</div></div></div>
+        <div class="tip-card"><div class="tip-icon">⏱️</div><div><div class="tip-title">Watch the timer</div><div class="tip-desc">Pace yourself throughout the exam</div></div></div>
+        <div class="tip-card"><div class="tip-icon">🌟</div><div><div class="tip-title">Do your best</div><div class="tip-desc">Review answers before submitting</div></div></div>
+        <div class="tip-card"><div class="tip-icon">🏆</div><div><div class="tip-title">Earn certificates</div><div class="tip-desc">Pass exams to earn your certificate</div></div></div>
       </div>
     </div>
-    <!-- Student exams -->
     <div id="studentExamsSection" style="display:none">
       <div class="section-header">
         <div class="section-title" style="margin:0"><span>📝</span> Available Exams</div>
       </div>
       <div class="grid grid-2" id="availableExamsList"></div>
     </div>
-    <!-- Admin quick nav -->
     <div id="adminNav" style="display:none">
       <div class="section-title"><span>⚡</span> Quick Actions</div>
       <div class="flex gap-10 mb-24" style="flex-wrap:wrap">
         <button class="btn btn-outline" onclick="showAdminTab('students')">👥 Students</button>
-        <button class="btn btn-outline" onclick="showAdminTab('bank')">📚 بنك الأسئلة</button>
+        <button class="btn btn-outline" onclick="showAdminTab('bank')">📚 Question Bank</button>
         <button class="btn btn-outline" onclick="showAdminTab('exams')">📋 Exams</button>
         <button class="btn btn-outline" onclick="showAdminTab('schedule')">🗓️ Schedule</button>
         <button class="btn btn-outline" onclick="showAdminTab('results')">📊 Results</button>
@@ -419,15 +316,23 @@
         <button class="btn btn-outline" onclick="showAdminTab('reports')">📈 Reports</button>
       </div>
     </div>
+    <div id="teacherNav" style="display:none">
+      <div class="section-title"><span>⚡</span> Teacher Quick Actions</div>
+      <div class="flex gap-10 mb-24" style="flex-wrap:wrap">
+        <button class="btn btn-outline" onclick="showTeacherTab('bank')">📚 My Questions</button>
+        <button class="btn btn-outline" onclick="showTeacherTab('exams')">📋 My Exams</button>
+        <button class="btn btn-outline" onclick="showTeacherTab('results')">📊 Results</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- ═══ PAGE: ADMIN ═══ -->
+<!-- ADMIN PAGE -->
 <div class="page" id="page-admin">
   <div class="container fade-in">
     <div class="tabs" id="adminTabs">
       <button class="tab active" onclick="switchAdminTab('students')" id="tabBtn-students">👥 Students</button>
-      <button class="tab" onclick="switchAdminTab('bank')" id="tabBtn-bank">📚 بنك الأسئلة</button>
+      <button class="tab" onclick="switchAdminTab('bank')" id="tabBtn-bank">📚 Question Bank</button>
       <button class="tab" onclick="switchAdminTab('exams')" id="tabBtn-exams">📋 Exams</button>
       <button class="tab" onclick="switchAdminTab('schedule')" id="tabBtn-schedule">🗓️ Schedule</button>
       <button class="tab" onclick="switchAdminTab('results')" id="tabBtn-results">📊 Results</button>
@@ -435,66 +340,64 @@
       <button class="tab" onclick="switchAdminTab('reports')" id="tabBtn-reports">📈 Reports</button>
     </div>
 
-    <!-- Students Tab -->
+    <!-- STUDENTS TAB -->
     <div id="adminTab-students">
       <div class="section-header">
-        <div class="section-title" style="margin:0">👥 Student Management</div>
-        <button class="btn btn-primary" style="width:auto;padding:10px 18px" onclick="openModal('modalAddStudent')">+ Add Student</button>
+        <div class="section-title" style="margin:0">👥 User Management</div>
+        <div class="flex gap-10">
+          <button class="btn btn-outline" style="width:auto;padding:10px 18px" onclick="openModal('modalAddTeacher')">+ Add Teacher</button>
+          <button class="btn btn-primary" style="width:auto;padding:10px 18px" onclick="openModal('modalAddStudent')">+ Add Student</button>
+        </div>
       </div>
       <div class="table-wrap">
-        <table><thead><tr><th>Name</th><th>Username</th><th>Email</th><th>WhatsApp</th><th>Gift</th><th>Joined</th><th>Actions</th></tr></thead>
-        <tbody id="studentsTable"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px">No students yet</td></tr></tbody></table>
+        <table><thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Email</th><th>WhatsApp</th><th>Joined</th><th>Actions</th></tr></thead>
+        <tbody id="studentsTable"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px">No users yet</td></tr></tbody></table>
       </div>
     </div>
 
-    <!-- Question Bank Tab -->
+    <!-- QUESTION BANK TAB -->
     <div id="adminTab-bank" style="display:none">
       <div class="section-header">
-        <div class="section-title" style="margin:0">📚 بنك الأسئلة</div>
-        <button class="btn btn-primary" style="width:auto;padding:10px 18px" onclick="openBankModal()">+ إضافة سؤال</button>
+        <div class="section-title" style="margin:0">📚 Question Bank</div>
+        <button class="btn btn-primary" style="width:auto;padding:10px 18px" onclick="openBankModal()">+ Add Question</button>
       </div>
       <div class="bank-filters">
-        <select id="bankFilterSubject" onchange="renderBankList()"><option value="">كل المواد</option></select>
-        <select id="bankFilterLevel" onchange="renderBankList()"><option value="">كل المستويات</option></select>
+        <select id="bankFilterSubject" onchange="renderBankList()"><option value="">All Subjects</option></select>
+        <select id="bankFilterLevel" onchange="renderBankList()"><option value="">All Levels</option></select>
+        <select id="bankFilterType" onchange="renderBankList()">
+          <option value="">All Types</option>
+          <option value="mcq">MCQ</option>
+          <option value="audio">Audio Answer</option>
+        </select>
+        <input type="text" id="bankSearch" placeholder="🔍 Search questions…" oninput="renderBankList()" style="min-width:200px"/>
       </div>
+      <div id="bankStats" style="margin-bottom:16px;font-size:13px;color:var(--muted)"></div>
       <div id="bankList"></div>
     </div>
 
-    <!-- Exams Tab -->
+    <!-- EXAMS TAB -->
     <div id="adminTab-exams" style="display:none">
       <div class="section-header">
         <div class="section-title" style="margin:0">📋 Exam Management</div>
-        <button class="btn btn-primary" style="width:auto;padding:10px 18px" onclick="openModal('modalCreateExam')">+ Create Exam</button>
+        <button class="btn btn-primary" style="width:auto;padding:10px 18px" onclick="openCreateExamModal()">+ Create Exam</button>
       </div>
       <div class="grid grid-2" id="adminExamList"></div>
     </div>
 
-    <!-- Schedule Tab -->
+    <!-- SCHEDULE TAB -->
     <div id="adminTab-schedule" style="display:none">
       <div class="section-header">
         <div class="section-title" style="margin:0">🗓️ Exam Schedule</div>
         <button class="btn btn-primary" style="width:auto;padding:10px 18px" onclick="openModal('modalSchedule')">+ Schedule Exam</button>
       </div>
       <div id="scheduleList" class="grid grid-2"></div>
-
-      <!-- WhatsApp Blast section -->
       <div style="margin-top:28px">
         <div class="section-title"><span>📣</span> Send WhatsApp Announcement</div>
         <div class="card" style="max-width:560px">
-          <div class="field">
-            <label>Select Scheduled Exam</label>
-            <select id="waBlastExam"><option value="">Choose exam…</option></select>
-          </div>
-          <div class="field">
-            <label>Select Students</label>
-            <select id="waBlastStudent">
-              <option value="all">All Students</option>
-            </select>
-          </div>
-          <div style="margin-bottom:12px">
-            <label class="field" style="display:block;margin-bottom:6px"><span style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Message Preview</span></label>
-            <div class="wa-msg-box" id="waPreview">Select an exam to preview message…</div>
-          </div>
+          <div class="field"><label>Select Scheduled Exam</label><select id="waBlastExam" onchange="updateWAPreview()"><option value="">Choose exam…</option></select></div>
+          <div class="field"><label>Select Students</label><select id="waBlastStudent"><option value="all">All Students</option></select></div>
+          <div style="margin-bottom:12px"><label class="field" style="display:block;margin-bottom:6px"><span style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Message Preview</span></label>
+          <div class="wa-msg-box" id="waPreview">Select an exam to preview message…</div></div>
           <div class="flex gap-10">
             <button class="btn btn-wa" style="flex:1" onclick="sendWABlast()">📲 Open WhatsApp</button>
             <button class="btn btn-ghost" onclick="copyWAMessage()">📋 Copy</button>
@@ -503,35 +406,31 @@
       </div>
     </div>
 
-    <!-- Results Tab -->
+    <!-- RESULTS TAB -->
     <div id="adminTab-results" style="display:none">
       <div class="section-title">📊 All Student Results</div>
       <div class="flex gap-10 mb-16" style="flex-wrap:wrap">
-        <select id="filterExam" onchange="renderResultsTable()" style="background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px">
-          <option value="">All Exams</option>
-        </select>
-        <select id="filterStudent" onchange="renderResultsTable()" style="background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px">
-          <option value="">All Students</option>
-        </select>
+        <select id="filterExam" onchange="renderResultsTable()" style="background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px"><option value="">All Exams</option></select>
+        <select id="filterStudent" onchange="renderResultsTable()" style="background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px"><option value="">All Students</option></select>
       </div>
       <div class="table-wrap">
         <table><thead><tr><th>Student</th><th>Exam</th><th>Status</th><th>Score</th><th>Grade</th><th>Time</th><th>Date</th><th>Note</th><th>Actions</th></tr></thead>
-        <tbody id="resultsTable"><tr><td colspan="9" style="text-align:center;color:var(--muted);padding:32px">No results yet</td></tr></tbody></table>
+        <tbody id="resultsTable"></tbody></table>
       </div>
     </div>
 
-    <!-- Discounts Tab -->
+    <!-- DISCOUNTS TAB -->
     <div id="adminTab-discounts" style="display:none">
       <div class="section-title">🎁 Send Gift / Discount</div>
       <div class="card" style="max-width:500px">
         <div id="discountAlert"></div>
         <div class="field"><label>Select Student</label><select id="discountStudent"><option value="">Choose student…</option></select></div>
         <div class="field"><label>Discount Code</label><input type="text" id="discountCode" placeholder="e.g. STAR25" style="text-transform:uppercase"/></div>
-        <div class="field"><label>Discount Value</label><input type="text" id="discountValue" placeholder="e.g. 25% off, 1 free session"/></div>
-        <div class="field"><label>Message to Student</label><textarea id="discountMsg" placeholder="Congratulations! You've earned this reward…"></textarea></div>
+        <div class="field"><label>Discount Value</label><input type="text" id="discountValue" placeholder="e.g. 25% off"/></div>
+        <div class="field"><label>Message to Student</label><textarea id="discountMsg" placeholder="Congratulations!…"></textarea></div>
         <div class="flex gap-10">
           <button class="btn btn-primary" style="flex:1" onclick="sendDiscount()">🎁 Send Gift</button>
-          <button class="btn btn-wa" onclick="sendDiscountViaWA()">📲 Send via WhatsApp</button>
+          <button class="btn btn-wa" onclick="sendDiscountViaWA()">📲 WhatsApp</button>
         </div>
       </div>
       <div class="mt-24">
@@ -541,39 +440,15 @@
       </div>
     </div>
 
-    <!-- Reports Tab -->
+    <!-- REPORTS TAB -->
     <div id="adminTab-reports" style="display:none">
       <div class="section-title">📈 Admin Reports</div>
       <div class="grid grid-2" style="max-width:700px">
-        <div class="card">
-          <div style="font-size:24px;margin-bottom:10px">📊</div>
-          <div class="card-title">Full Performance Report</div>
-          <div class="card-meta">All students • All exams • Leaderboard • Stats</div>
-          <button class="btn btn-primary" onclick="downloadAdminReport()">📥 Download PDF</button>
-        </div>
-        <div class="card">
-          <div style="font-size:24px;margin-bottom:10px">👥</div>
-          <div class="card-title">Student Report</div>
-          <div class="card-meta">Filter by specific student</div>
-          <div class="field" style="margin-bottom:10px"><select id="reportStudentSelect" style="width:100%;background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px"><option value="">All Students</option></select></div>
-          <button class="btn btn-outline" onclick="downloadStudentReport()">📥 Download PDF</button>
-        </div>
-        <div class="card">
-          <div style="font-size:24px;margin-bottom:10px">📝</div>
-          <div class="card-title">Exam Report</div>
-          <div class="card-meta">Filter by specific exam</div>
-          <div class="field" style="margin-bottom:10px"><select id="reportExamSelect" style="width:100%;background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px"><option value="">All Exams</option></select></div>
-          <button class="btn btn-outline" onclick="downloadExamReport()">📥 Download PDF</button>
-        </div>
-        <div class="card">
-          <div style="font-size:24px;margin-bottom:10px">📣</div>
-          <div class="card-title">WhatsApp Results Blast</div>
-          <div class="card-meta">Send individual results to all students via WhatsApp</div>
-          <button class="btn btn-wa" onclick="openWAResultsBlast()">📲 Send Results</button>
-        </div>
+        <div class="card"><div style="font-size:24px;margin-bottom:10px">📊</div><div class="card-title">Full Performance Report</div><div class="card-meta">All students • All exams • Leaderboard</div><button class="btn btn-primary" onclick="downloadAdminReport()">📥 Download PDF</button></div>
+        <div class="card"><div style="font-size:24px;margin-bottom:10px">👥</div><div class="card-title">Student Report</div><div class="card-meta">Filter by student</div><div class="field" style="margin-bottom:10px"><select id="reportStudentSelect" style="width:100%;background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px"><option value="">All Students</option></select></div><button class="btn btn-outline" onclick="downloadStudentReport()">📥 Download PDF</button></div>
+        <div class="card"><div style="font-size:24px;margin-bottom:10px">📝</div><div class="card-title">Exam Report</div><div class="card-meta">Filter by exam</div><div class="field" style="margin-bottom:10px"><select id="reportExamSelect" style="width:100%;background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px"><option value="">All Exams</option></select></div><button class="btn btn-outline" onclick="downloadExamReport()">📥 Download PDF</button></div>
+        <div class="card"><div style="font-size:24px;margin-bottom:10px">📣</div><div class="card-title">WhatsApp Results Blast</div><div class="card-meta">Send results to students</div><button class="btn btn-wa" onclick="openWAResultsBlast()">📲 Send Results</button></div>
       </div>
-
-      <!-- WA Results Blast area -->
       <div id="waResultsArea" style="display:none;margin-top:24px;max-width:560px">
         <div class="section-title">📲 Send Results via WhatsApp</div>
         <div class="field"><label>Select Exam</label><select id="waResultExam" onchange="previewResultWA()"><option value="">Choose exam…</option></select></div>
@@ -585,7 +460,44 @@
   </div>
 </div>
 
-<!-- ═══ PAGE: EXAM TAKING ═══ -->
+<!-- TEACHER PAGE -->
+<div class="page" id="page-teacher">
+  <div class="container fade-in">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTeacherTab('bank')" id="teacherTabBtn-bank">📚 My Questions</button>
+      <button class="tab" onclick="switchTeacherTab('exams')" id="teacherTabBtn-exams">📋 My Exams</button>
+      <button class="tab" onclick="switchTeacherTab('results')" id="teacherTabBtn-results">📊 Results</button>
+    </div>
+    <div id="teacherTab-bank">
+      <div class="section-header">
+        <div class="section-title" style="margin:0">📚 My Question Bank</div>
+        <button class="btn btn-primary" style="width:auto;padding:10px 18px" onclick="openBankModal()">+ Add Question</button>
+      </div>
+      <div class="bank-filters">
+        <select id="tBankFilterSubject" onchange="renderTeacherBankList()"><option value="">All Subjects</option></select>
+        <select id="tBankFilterLevel" onchange="renderTeacherBankList()"><option value="">All Levels</option></select>
+        <input type="text" id="tBankSearch" placeholder="🔍 Search…" oninput="renderTeacherBankList()" style="min-width:180px;background:#F5FAFF;border:2px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text)"/>
+      </div>
+      <div id="teacherBankList"></div>
+    </div>
+    <div id="teacherTab-exams" style="display:none">
+      <div class="section-header">
+        <div class="section-title" style="margin:0">📋 My Exams</div>
+        <button class="btn btn-primary" style="width:auto;padding:10px 18px" onclick="openCreateExamModal()">+ Create Exam</button>
+      </div>
+      <div class="grid grid-2" id="teacherExamList"></div>
+    </div>
+    <div id="teacherTab-results" style="display:none">
+      <div class="section-title">📊 Results for My Exams</div>
+      <div class="table-wrap">
+        <table><thead><tr><th>Student</th><th>Exam</th><th>Status</th><th>Score</th><th>Grade</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody id="teacherResultsTable"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXAM PAGE -->
 <div class="page" id="page-exam">
   <div class="exam-wrap fade-in">
     <div class="exam-header">
@@ -608,7 +520,7 @@
   </div>
 </div>
 
-<!-- ═══ PAGE: RESULT ═══ -->
+<!-- RESULT PAGE -->
 <div class="page" id="page-result">
   <div class="exam-wrap fade-in">
     <div class="result-card">
@@ -620,10 +532,8 @@
       <div class="result-grade" id="resultGrade">—</div>
       <p class="text-muted" id="resultDetail"></p>
       <div class="pending-note" id="pendingNote" style="display:none">
-        ⏳ تم استلام إجاباتك بنجاح. يحتوي هذا الامتحان على أسئلة تحتاج تصحيحًا يدويًا (مثل الإجابات الصوتية)،
-        وستظهر نتيجتك النهائية بعد مراجعة المعلم وسيصلك إشعار فور ظهورها.
+        ⏳ Your answers have been received. This exam contains questions that require manual grading. Your final result will appear once your teacher reviews it — you'll receive a notification.
       </div>
-
       <div id="discountSection" style="display:none">
         <div class="discount-reveal">
           <div style="font-size:12px;color:var(--muted);margin-bottom:4px">🎁 Special Gift from MY Institute</div>
@@ -632,16 +542,12 @@
           <div style="font-size:12px;color:var(--muted);margin-top:6px" id="discountMsgDisplay"></div>
         </div>
       </div>
-
-      <!-- Certificate download (shown only on pass) -->
       <div id="certSection" style="display:none;margin-top:16px">
-        <div style="background:linear-gradient(135deg,rgba(21,101,192,.15) 0%,rgba(21,101,192,.03) 100%);
-          border:1px solid var(--gold);border-radius:12px;padding:16px;text-align:center">
+        <div style="background:linear-gradient(135deg,rgba(21,101,192,.15) 0%,rgba(21,101,192,.03) 100%);border:1px solid var(--gold);border-radius:12px;padding:16px;text-align:center">
           <div style="font-size:13px;color:var(--gold-pale);margin-bottom:10px">🎓 Congratulations! Download your certificate</div>
           <button class="btn btn-primary" style="width:auto;padding:10px 24px" onclick="downloadCertificate()">📜 Download Certificate</button>
         </div>
       </div>
-
       <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
         <button class="btn btn-outline" onclick="showPage('page-home')" style="flex:1">🏠 Home</button>
         <button class="btn btn-ghost" id="reviewBtn" onclick="startReview()" style="flex:1">📖 Review</button>
@@ -651,28 +557,19 @@
   </div>
 </div>
 
-<!-- ═══ PAGE: STUDENT PROFILE ═══ -->
+<!-- STUDENT PROFILE -->
 <div class="page" id="page-profile">
   <div class="container fade-in">
     <div class="section-title">👤 My Profile & Progress</div>
     <div class="grid grid-2">
-      <div class="card">
-        <div class="text-muted mb-16">📊 My Exam History</div>
-        <div id="myScores"></div>
-      </div>
-      <div class="card">
-        <div class="text-muted mb-16">🎁 My Gifts</div>
-        <div id="myDiscounts"></div>
-      </div>
-      <div class="card" style="grid-column:1/-1">
-        <div class="text-muted mb-16">📜 My Certificates</div>
-        <div id="myCerts"></div>
-      </div>
+      <div class="card"><div class="text-muted mb-16">📊 My Exam History</div><div id="myScores"></div></div>
+      <div class="card"><div class="text-muted mb-16">🎁 My Gifts</div><div id="myDiscounts"></div></div>
+      <div class="card" style="grid-column:1/-1"><div class="text-muted mb-16">📜 My Certificates</div><div id="myCerts"></div></div>
     </div>
   </div>
 </div>
 
-<!-- ════════ MODALS ════════ -->
+<!-- ══════════ MODALS ══════════ -->
 
 <!-- Add Student -->
 <div class="modal-overlay" id="modalAddStudent">
@@ -680,95 +577,127 @@
     <div class="modal-title">Add New Student <button class="close-btn" onclick="closeModal('modalAddStudent')">✕</button></div>
     <div id="addStudentAlert"></div>
     <div class="field"><label>Full Name</label><input type="text" id="newStudentName" placeholder="Student's full name"/></div>
-    <div class="field"><label>Username</label><input type="text" id="newStudentUsername" placeholder="Login username (no spaces)"/></div>
+    <div class="field"><label>Username</label><input type="text" id="newStudentUsername" placeholder="Login username"/></div>
     <div class="field"><label>Password</label><input type="password" id="newStudentPass" placeholder="Set password"/></div>
     <div class="field"><label>Email (optional)</label><input type="email" id="newStudentEmail" placeholder="student@email.com"/></div>
-    <div class="field"><label>WhatsApp Number (optional)</label><input type="text" id="newStudentWA" placeholder="e.g. +447911123456"/></div>
+    <div class="field"><label>WhatsApp (optional)</label><input type="text" id="newStudentWA" placeholder="+447911123456"/></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('modalAddStudent')">Cancel</button>
-      <button class="btn btn-primary" style="width:auto;padding:10px 24px" onclick="addStudent()">Create Account</button>
+      <button class="btn btn-primary" style="width:auto;padding:10px 24px" onclick="addUser('student')">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Teacher -->
+<div class="modal-overlay" id="modalAddTeacher">
+  <div class="modal">
+    <div class="modal-title">Add New Teacher <button class="close-btn" onclick="closeModal('modalAddTeacher')">✕</button></div>
+    <div id="addTeacherAlert"></div>
+    <div class="field"><label>Full Name</label><input type="text" id="newTeacherName" placeholder="Teacher's full name"/></div>
+    <div class="field"><label>Username</label><input type="text" id="newTeacherUsername" placeholder="Login username"/></div>
+    <div class="field"><label>Password</label><input type="password" id="newTeacherPass" placeholder="Set password"/></div>
+    <div class="field"><label>Subject Specialty</label>
+      <input list="subjectOptions" id="newTeacherSubject" placeholder="e.g. Quran / Arabic…"/>
+      <datalist id="subjectOptions"><option value="Quran"><option value="Arabic"><option value="Islamic Studies"><option value="Tajweed"></datalist>
+    </div>
+    <div class="field"><label>Email (optional)</label><input type="email" id="newTeacherEmail" placeholder="teacher@email.com"/></div>
+    <div class="field"><label>WhatsApp (optional)</label><input type="text" id="newTeacherWA" placeholder="+447911123456"/></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modalAddTeacher')">Cancel</button>
+      <button class="btn btn-primary" style="width:auto;padding:10px 24px" onclick="addUser('teacher')">Create Account</button>
     </div>
   </div>
 </div>
 
 <!-- Add/Edit Bank Question -->
 <div class="modal-overlay" id="modalBankQuestion">
-  <div class="modal">
-    <div class="modal-title"><span id="bankModalTitle">إضافة سؤال لبنك الأسئلة</span> <button class="close-btn" onclick="closeModal('modalBankQuestion')">✕</button></div>
+  <div class="modal" style="max-width:640px">
+    <div class="modal-title"><span id="bankModalTitle">Add Question to Bank</span> <button class="close-btn" onclick="closeModal('modalBankQuestion')">✕</button></div>
     <input type="hidden" id="bankQId"/>
     <div id="bankQAlert"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="field"><label>المادة</label>
-        <input list="subjectOptions" id="bankQSubject" placeholder="قرآن / عربي / دراسات إسلامية / أخرى…"/>
-        <datalist id="subjectOptions"><option value="قرآن"><option value="عربي"><option value="دراسات إسلامية"></datalist>
+      <div class="field"><label>Subject</label>
+        <input list="subjectOptionsFull" id="bankQSubject" placeholder="Quran / Arabic / Islamic Studies…"/>
+        <datalist id="subjectOptionsFull"><option value="Quran"><option value="Arabic"><option value="Islamic Studies"><option value="Tajweed"><option value="Fiqh"><option value="Aqeedah"><option value="Seerah"></datalist>
       </div>
-      <div class="field"><label>المستوى</label>
-        <input list="levelOptions" id="bankQLevel" placeholder="مستوى 1 / مستوى 2 …"/>
-        <datalist id="levelOptions"><option value="مستوى 1"><option value="مستوى 2"><option value="مستوى 3"><option value="مستوى 4"><option value="مستوى 5"></datalist>
+      <div class="field"><label>Level</label>
+        <input list="levelOptions" id="bankQLevel" placeholder="Level 1 / Level 2…"/>
+        <datalist id="levelOptions"><option value="Level 1"><option value="Level 2"><option value="Level 3"><option value="Level 4"><option value="Level 5"><option value="Beginner"><option value="Intermediate"><option value="Advanced"></datalist>
       </div>
     </div>
-    <div class="field"><label>درجة السؤال</label><input type="number" id="bankQPoints" value="1" min="0.5" step="0.5"/></div>
-    <div class="field"><label>نص السؤال</label><textarea id="bankQText" placeholder="اكتب نص السؤال…"></textarea></div>
+    <div class="field"><label>Points for this question</label><input type="number" id="bankQPoints" value="1" min="0.5" step="0.5"/></div>
+    <div class="field"><label>Question Text</label><textarea id="bankQText" placeholder="Write the question…"></textarea></div>
     <div class="field">
-      <label>صورة مرفقة (اختياري)</label>
+      <label>Attach Image (optional)</label>
       <input type="file" id="bankQImageFile" accept="image/*" onchange="handleImagePick(this,'bankQImagePreview','bankQImageData')"/>
       <img id="bankQImagePreview" class="q-img-preview" style="display:none"/>
       <input type="hidden" id="bankQImageData"/>
     </div>
     <div class="field" style="display:flex;align-items:center;gap:8px">
       <input type="checkbox" id="bankQAudio" style="width:auto" onchange="toggleBankOptionsVisibility()"/>
-      <label style="margin:0">🎙️ إجابة السؤال صوتية (يحتاج تصحيح يدوي)</label>
+      <label style="margin:0">🎙️ Audio answer required (manual grading)</label>
     </div>
     <div id="bankQOptionsWrap">
-      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">☝️ اختر الإجابة الصحيحة بالراديو</div>
-      <div class="option-input"><input type="radio" name="bankQCorrect" value="0" id="bqr-0"/><label for="bqr-0">A</label><input type="text" id="bankQ-opt-0" placeholder="الاختيار A…"/></div>
-      <div class="option-input"><input type="radio" name="bankQCorrect" value="1" id="bqr-1"/><label for="bqr-1">B</label><input type="text" id="bankQ-opt-1" placeholder="الاختيار B…"/></div>
-      <div class="option-input"><input type="radio" name="bankQCorrect" value="2" id="bqr-2"/><label for="bqr-2">C</label><input type="text" id="bankQ-opt-2" placeholder="الاختيار C…"/></div>
-      <div class="option-input"><input type="radio" name="bankQCorrect" value="3" id="bqr-3"/><label for="bqr-3">D</label><input type="text" id="bankQ-opt-3" placeholder="الاختيار D…"/></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Select the correct answer with the radio button ☝️</div>
+      <div class="option-input"><input type="radio" name="bankQCorrect" value="0" id="bqr-0"/><label for="bqr-0">A</label><input type="text" id="bankQ-opt-0" placeholder="Option A…"/></div>
+      <div class="option-input"><input type="radio" name="bankQCorrect" value="1" id="bqr-1"/><label for="bqr-1">B</label><input type="text" id="bankQ-opt-1" placeholder="Option B…"/></div>
+      <div class="option-input"><input type="radio" name="bankQCorrect" value="2" id="bqr-2"/><label for="bqr-2">C</label><input type="text" id="bankQ-opt-2" placeholder="Option C…"/></div>
+      <div class="option-input"><input type="radio" name="bankQCorrect" value="3" id="bqr-3"/><label for="bqr-3">D</label><input type="text" id="bankQ-opt-3" placeholder="Option D…"/></div>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal('modalBankQuestion')">إلغاء</button>
-      <button class="btn btn-primary" style="width:auto;padding:10px 24px" onclick="saveBankQuestion()">💾 حفظ السؤال</button>
+      <button class="btn btn-ghost" onclick="closeModal('modalBankQuestion')">Cancel</button>
+      <button class="btn btn-primary" style="width:auto;padding:10px 24px" onclick="saveBankQuestion()">💾 Save to Bank</button>
     </div>
   </div>
 </div>
 
 <!-- Create Exam -->
 <div class="modal-overlay" id="modalCreateExam">
-  <div class="modal" style="max-width:700px">
+  <div class="modal" style="max-width:760px">
     <div class="modal-title">Create New Exam <button class="close-btn" onclick="closeModal('modalCreateExam')">✕</button></div>
     <div id="createExamAlert"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="field"><label>Exam Title</label><input type="text" id="examTitle" placeholder="e.g. Tajweed Level 1"/></div>
-      <div class="field"><label>Subject</label><input list="subjectOptions" id="examSubject" placeholder="قرآن / عربي / دراسات إسلامية / أخرى…"/></div>
-      <div class="field"><label>المستوى</label><input list="levelOptions" id="examLevel" placeholder="مستوى 1 / مستوى 2 …"/></div>
+      <div class="field"><label>Subject</label>
+        <input list="subjectOptionsFull" id="examSubject" placeholder="Quran / Arabic…"/>
+      </div>
+      <div class="field"><label>Level</label>
+        <input list="levelOptions" id="examLevel" placeholder="Level 1 / Level 2…"/>
+      </div>
       <div class="field"><label>Duration (minutes)</label><input type="number" id="examDuration" value="30" min="1" max="180"/></div>
       <div class="field"><label>Passing Score (%)</label><input type="number" id="examPass" value="60" min="1" max="100"/></div>
+      <div class="field"><label>Result Mode</label>
+        <select id="examResultMode">
+          <option value="auto">⚡ Instant — show result immediately</option>
+          <option value="manual">⏳ Manual — teacher grades first</option>
+        </select>
+      </div>
     </div>
     <div class="field"><label>Description</label><textarea id="examDesc" placeholder="Brief description…" style="min-height:60px"></textarea></div>
     <hr class="divider"/>
     <div class="field">
-      <label>👥 تخصيص الامتحان لطلاب معينين (اتركه فارغًا ليكون متاحًا للجميع)</label>
-      <div style="margin-bottom:8px"><label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><input type="checkbox" id="examAssignAll" checked onchange="toggleAssignAll()" style="width:auto"/> متاح لكل الطلاب</label></div>
+      <label>👥 Assign to specific students (leave empty = all students)</label>
+      <div style="margin-bottom:8px"><label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><input type="checkbox" id="examAssignAll" checked onchange="toggleAssignAll()" style="width:auto"/> Available to all students</label></div>
       <div class="student-pick-list" id="examStudentPickList" style="display:none"></div>
     </div>
     <hr class="divider"/>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <div style="font-family:'Cinzel',serif;font-size:14px;color:var(--gold-light)">📚 استيراد من بنك الأسئلة</div>
+      <div style="font-family:'Cinzel',serif;font-size:14px;color:var(--gold-light)">📚 Import from Question Bank</div>
     </div>
     <div class="bank-filters">
-      <select id="pickBankSubject" onchange="renderBankPicker()"><option value="">كل المواد</option></select>
-      <select id="pickBankLevel" onchange="renderBankPicker()"><option value="">كل المستويات</option></select>
+      <select id="pickBankSubject" onchange="renderBankPicker()"><option value="">All Subjects</option></select>
+      <select id="pickBankLevel" onchange="renderBankPicker()"><option value="">All Levels</option></select>
+      <input type="text" id="pickBankSearch" placeholder="🔍 Search bank…" oninput="renderBankPicker()" style="min-width:160px;background:#F5FAFF;border:2px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text)"/>
     </div>
     <div id="bankPickerList" style="max-height:220px;overflow-y:auto;margin-bottom:10px"></div>
-    <button class="btn btn-outline" style="width:100%;margin-bottom:16px" onclick="addSelectedBankQuestions()">+ إضافة الأسئلة المختارة</button>
+    <button class="btn btn-outline" style="width:100%;margin-bottom:16px" onclick="addSelectedBankQuestions()">+ Add Selected Questions to Exam</button>
     <hr class="divider"/>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <div style="font-family:'Cinzel',serif;font-size:14px;color:var(--gold-light)">Questions</div>
-      <span class="text-muted" style="font-size:12px">Radio button = correct answer • ✏️ سؤال جديد يُضاف تلقائيًا لبنك الأسئلة</span>
+      <div style="font-family:'Cinzel',serif;font-size:14px;color:var(--gold-light)">✏️ Write New Questions</div>
+      <span class="text-muted" style="font-size:12px">New questions auto-save to Question Bank</span>
     </div>
     <div id="questionsBuilder"></div>
-    <button class="add-q-btn" onclick="addQuestion()">+ Add Question</button>
+    <button class="add-q-btn" onclick="addQuestion()">+ Add New Question</button>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('modalCreateExam')">Cancel</button>
       <button class="btn btn-primary" style="width:auto;padding:10px 24px" onclick="saveExam()">💾 Save Exam</button>
@@ -788,7 +717,7 @@
     </div>
     <div class="field"><label>Notes (optional)</label><input type="text" id="schedNotes" placeholder="e.g. Open to Level 1 students only"/></div>
     <div style="background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--muted)">
-      💡 After scheduling, you can send a WhatsApp reminder to all students from the Schedule tab.
+      💡 Students can take the exam once per day during the open window.
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('modalSchedule')">Cancel</button>
@@ -797,12 +726,12 @@
   </div>
 </div>
 
-<!-- Grade / Note -->
+<!-- Grade Note -->
 <div class="modal-overlay" id="modalGrade">
   <div class="modal" style="max-width:400px">
     <div class="modal-title">✏️ Add Note <button class="close-btn" onclick="closeModal('modalGrade')">✕</button></div>
     <input type="hidden" id="gradeResultId"/>
-    <div class="field"><label>Admin Note</label><textarea id="gradeNote" placeholder="e.g. Excellent work! Keep it up…"></textarea></div>
+    <div class="field"><label>Admin Note</label><textarea id="gradeNote" placeholder="e.g. Excellent work!…"></textarea></div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('modalGrade')">Cancel</button>
       <button class="btn btn-primary" style="width:auto;padding:10px 20px" onclick="saveGrade()">Save</button>
@@ -810,56 +739,45 @@
   </div>
 </div>
 
-<!-- Manual Grading (audio / open questions) -->
+<!-- Manual Grading -->
 <div class="modal-overlay" id="modalGradeManual">
   <div class="modal" style="max-width:640px">
-    <div class="modal-title">✏️ تصحيح الأسئلة اليدوية <button class="close-btn" onclick="closeModal('modalGradeManual')">✕</button></div>
+    <div class="modal-title">✏️ Manual Grading <button class="close-btn" onclick="closeModal('modalGradeManual')">✕</button></div>
     <input type="hidden" id="gmResultId"/>
     <div id="gmAlert"></div>
     <div id="gmQuestionsList"></div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" onclick="closeModal('modalGradeManual')">إلغاء</button>
-      <button class="btn btn-primary" style="width:auto;padding:10px 20px" onclick="publishManualGrade()">✅ نشر النتيجة وإخطار الطالب</button>
+      <button class="btn btn-ghost" onclick="closeModal('modalGradeManual')">Cancel</button>
+      <button class="btn btn-primary" style="width:auto;padding:10px 20px" onclick="publishManualGrade()">✅ Publish Result & Notify Student</button>
     </div>
   </div>
 </div>
 
-<!-- ════════ SCRIPT ════════ -->
 <script>
-// ─── SUPABASE CONFIG ───────────────────────
-const SB_URL = 'https://icmgyhwghunrobgxnmdl.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljbWd5aHdnaHVucm9iZ3hubWRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMDIyNzIsImV4cCI6MjA5ODc3ODI3Mn0.O3ig1_zbBgPyYwP4QGOFKfb2wAee2Uz61HvO2AjpNuY';
+// ── SUPABASE ─────────────────────────────────
+const SB_URL='https://icmgyhwghunrobgxnmdl.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljbWd5aHdnaHVucm9iZ3hubWRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMDIyNzIsImV4cCI6MjA5ODc3ODI3Mn0.O3ig1_zbBgPyYwP4QGOFKfb2wAee2Uz61HvO2AjpNuY';
+const sb=(path,opts={})=>fetch(`${SB_URL}/rest/v1/${path}`,{headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json','Prefer':opts.prefer||'return=representation',...(opts.headers||{})},...opts});
 
-const sb = (path, opts={}) => fetch(`${SB_URL}/rest/v1/${path}`, {
-  headers:{
-    'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,
-    'Content-Type':'application/json',
-    'Prefer': opts.prefer||'return=representation',
-    ...(opts.headers||{})
-  },...opts
-});
-
-// ─── STATE ─────────────────────────────────
-let currentUser=null, allStudents=[], allExams=[], allResults=[], allDiscounts=[], allSchedules=[];
-let allQuestionBank=[], allNotifications=[];
-let activeExam=null, answers={}, audioAnswers={}, timerInterval=null, timeLeft=0, examStartTime=null;
-let questionIndex=0, lastResult=null;
-let questionCount=0;
-let mediaRecorderCurrent=null, mediaChunksCurrent=[], mediaStreamCurrent=null;
+// ── STATE ────────────────────────────────────
+let currentUser=null,allStudents=[],allExams=[],allResults=[],allDiscounts=[],allSchedules=[];
+let allQuestionBank=[],allNotifications=[],allTeachers=[];
+let activeExam=null,answers={},audioAnswers={},timerInterval=null,timeLeft=0,examStartTime=null;
+let questionIndex=0,lastResult=null,questionCount=0;
+let mediaRecorderCurrent=null,mediaChunksCurrent=[],mediaStreamCurrent=null;
 const todayStr=()=>new Date().toISOString().slice(0,10);
 
-// ─── INIT ───────────────────────────────────
+// ── INIT ─────────────────────────────────────
 window.onload=async()=>{
   const saved=sessionStorage.getItem('mi_user');
   if(saved){currentUser=JSON.parse(saved);await afterLogin();}
   setInterval(updateScheduleCountdowns,1000);
 };
 
-// ─── LOADING ────────────────────────────────
-const showLoading=(msg='Loading…')=>{document.getElementById('loadingText').textContent=msg;document.getElementById('loadingOverlay').classList.add('show')};
+const showLoading=(msg='Loading…')=>{document.getElementById('loadingText').textContent=msg;document.getElementById('loadingOverlay').classList.add('show');};
 const hideLoading=()=>document.getElementById('loadingOverlay').classList.remove('show');
 
-// ─── AUTH ───────────────────────────────────
+// ── AUTH ─────────────────────────────────────
 async function login(){
   const username=document.getElementById('loginUsername').value.trim();
   const password=document.getElementById('loginPassword').value;
@@ -874,34 +792,45 @@ async function login(){
     const user=users[0];
     if(user.password!==password){alertEl.innerHTML='<div class="alert alert-error">Incorrect password.</div>';hideLoading();return;}
     currentUser=user;sessionStorage.setItem('mi_user',JSON.stringify(user));await afterLogin();
-  }catch(e){alertEl.innerHTML='<div class="alert alert-error">Connection error. Check Supabase config.</div>';hideLoading();}
+  }catch(e){alertEl.innerHTML='<div class="alert alert-error">Connection error.</div>';hideLoading();}
 }
 
 async function afterLogin(){
   showLoading('Loading data…');
   document.getElementById('mainHeader').style.display='block';
-  document.getElementById('headerUser').textContent=(currentUser.role==='admin'?'⚙️ Admin: ':'🎓 ')+currentUser.name;
-  if(currentUser.role!=='admin')document.getElementById('headerProfileBtn').style.display='inline-flex';
-  if(currentUser.role==='admin')document.getElementById('headerAdminBtn').style.display='inline-flex';
+  const roleLabel=currentUser.role==='admin'?'⚙️ Admin: ':currentUser.role==='teacher'?'📚 Teacher: ':'🎓 ';
+  document.getElementById('headerUser').textContent=roleLabel+currentUser.name;
+  document.getElementById('headerProfileBtn').style.display=currentUser.role==='student'?'inline-flex':'none';
+  document.getElementById('headerAdminBtn').style.display=currentUser.role==='admin'?'inline-flex':'none';
+  document.getElementById('headerTeacherBtn').style.display=currentUser.role==='teacher'?'inline-flex':'none';
   await loadAllData();
   hideLoading();
   if(currentUser.role==='admin'){
     document.getElementById('adminStats').style.display='grid';
     document.getElementById('adminNav').style.display='block';
+    document.getElementById('teacherNav').style.display='none';
     document.getElementById('studentExamsSection').style.display='none';
+    document.getElementById('tipsRow').style.display='none';
+  }else if(currentUser.role==='teacher'){
+    document.getElementById('adminStats').style.display='none';
+    document.getElementById('adminNav').style.display='none';
+    document.getElementById('teacherNav').style.display='block';
+    document.getElementById('studentExamsSection').style.display='none';
+    document.getElementById('tipsRow').style.display='none';
   }else{
     document.getElementById('adminStats').style.display='none';
     document.getElementById('adminNav').style.display='none';
+    document.getElementById('teacherNav').style.display='none';
     document.getElementById('tipsRow').style.display='block';
     document.getElementById('studentExamsSection').style.display='block';
-    renderAvailableExams();
-    renderStudentProfile();
-    renderNotifBanner();
+    renderAvailableExams();renderStudentProfile();renderNotifBanner();
   }
   renderLeaderboard();updateAdminStats();showPage('page-home');
   document.getElementById('homeWelcome').textContent=`Welcome, ${currentUser.name}!`;
   document.getElementById('homeSubtitle').textContent=currentUser.role==='admin'
     ?'Admin Dashboard — Manage students, exams, schedules, and results.'
+    :currentUser.role==='teacher'
+    ?'Teacher Panel — Add questions, create exams, and grade results.'
     :'Your learning portal — take exams and track your progress.';
 }
 
@@ -912,10 +841,10 @@ function logout(){
   document.getElementById('loginAlert').innerHTML='';showPage('page-login');
 }
 
-// ─── DATA ───────────────────────────────────
+// ── DATA ─────────────────────────────────────
 async function loadAllData(){
   const [sR,eR,rR,dR,scR,bR,nR]=await Promise.all([
-    sb('users?role=eq.student&select=*&order=name.asc'),
+    sb('users?select=*&order=name.asc'),
     sb('exams?select=*&order=created_at.desc'),
     sb('results?select=*&order=submitted_at.desc'),
     sb('discounts?select=*&order=created_at.desc'),
@@ -924,15 +853,19 @@ async function loadAllData(){
     sb('notifications?select=*&order=created_at.desc')
   ]);
   const j=async r=>{try{const d=await r.json();return Array.isArray(d)?d:[];}catch{return [];}};
-  [allStudents,allExams,allResults,allDiscounts,allSchedules,allQuestionBank,allNotifications]=
-    await Promise.all([j(sR),j(eR),j(rR),j(dR),j(scR),j(bR),j(nR)]);
+  const allUsers=await j(sR);
+  allStudents=allUsers.filter(u=>u.role==='student');
+  allTeachers=allUsers.filter(u=>u.role==='teacher');
+  [,allExams,allResults,allDiscounts,allSchedules,allQuestionBank,allNotifications]=
+    await Promise.all([Promise.resolve(allUsers),j(eR),j(rR),j(dR),j(scR),j(bR),j(nR)]);
 }
 
-// ─── LEADERBOARD ────────────────────────────
+// ── LEADERBOARD ──────────────────────────────
 function renderLeaderboard(){
   const lb=document.getElementById('leaderboardList');
+  const gradedResults=allResults.filter(r=>r.graded!==false);
   const scoreMap={};
-  allResults.forEach(r=>{if(!scoreMap[r.student_id]||r.score>scoreMap[r.student_id].score)scoreMap[r.student_id]=r;});
+  gradedResults.forEach(r=>{if(!scoreMap[r.student_id]||r.score>scoreMap[r.student_id].score)scoreMap[r.student_id]=r;});
   const sorted=Object.values(scoreMap).sort((a,b)=>b.score-a.score).slice(0,10);
   if(!sorted.length){lb.innerHTML='<div class="empty-state"><div class="icon">🎓</div><p>No results yet. Be the first!</p></div>';return;}
   const colors=['#1565C0','#16A34A','#0EA5E9','#0891B2','#059669','#2563EB'];
@@ -957,50 +890,65 @@ function updateAdminStats(){
   document.getElementById('statStudents').textContent=allStudents.length;
   document.getElementById('statExams').textContent=allExams.length;
   document.getElementById('statAttempts').textContent=allResults.length;
-  document.getElementById('statDiscounts').textContent=allDiscounts.length;
+  document.getElementById('statBank').textContent=allQuestionBank.length;
 }
 
-// ─── STUDENTS ───────────────────────────────
-async function addStudent(){
-  const name=document.getElementById('newStudentName').value.trim();
-  const username=document.getElementById('newStudentUsername').value.trim().toLowerCase();
-  const password=document.getElementById('newStudentPass').value;
-  const email=document.getElementById('newStudentEmail').value.trim();
-  const whatsapp=document.getElementById('newStudentWA').value.trim();
-  const alertEl=document.getElementById('addStudentAlert');
+// ── USERS (admin) ────────────────────────────
+async function addUser(role){
+  const isTeacher=role==='teacher';
+  const nameId=isTeacher?'newTeacherName':'newStudentName';
+  const userIdEl=isTeacher?'newTeacherUsername':'newStudentUsername';
+  const passId=isTeacher?'newTeacherPass':'newStudentPass';
+  const emailId=isTeacher?'newTeacherEmail':'newStudentEmail';
+  const waId=isTeacher?'newTeacherWA':'newStudentWA';
+  const alertId=isTeacher?'addTeacherAlert':'addStudentAlert';
+  const modalId=isTeacher?'modalAddTeacher':'modalAddStudent';
+  const name=document.getElementById(nameId).value.trim();
+  const username=document.getElementById(userIdEl).value.trim().toLowerCase();
+  const password=document.getElementById(passId).value;
+  const email=document.getElementById(emailId).value.trim();
+  const whatsapp=document.getElementById(waId).value.trim();
+  const subject=isTeacher?(document.getElementById('newTeacherSubject')?.value.trim()||''):'';
+  const alertEl=document.getElementById(alertId);
   if(!name||!username||!password){alertEl.innerHTML='<div class="alert alert-error">Name, username and password required.</div>';return;}
-  showLoading('Creating student…');
-  const res=await sb('users',{method:'POST',body:JSON.stringify({name,username,password,email,whatsapp,role:'student',created_at:new Date().toISOString()})});
+  showLoading(`Creating ${role}…`);
+  const payload={name,username,password,email,whatsapp,role,created_at:new Date().toISOString()};
+  if(isTeacher)payload.subject=subject;
+  const res=await sb('users',{method:'POST',body:JSON.stringify(payload)});
   const data=await res.json();hideLoading();
-  if(res.ok){allStudents.push(data[0]||data);renderStudentsTable();updateAdminStats();populateDropdowns();closeModal('modalAddStudent');
-    ['newStudentName','newStudentUsername','newStudentPass','newStudentEmail','newStudentWA'].forEach(id=>document.getElementById(id).value='');alertEl.innerHTML='';}
-  else{alertEl.innerHTML=`<div class="alert alert-error">${data.message||'Error creating student.'}</div>`;}
+  if(res.ok){
+    await loadAllData();renderStudentsTable();updateAdminStats();populateDropdowns();closeModal(modalId);
+    [nameId,userIdEl,passId,emailId,waId].forEach(id=>document.getElementById(id).value='');
+    alertEl.innerHTML='';
+  }else{alertEl.innerHTML=`<div class="alert alert-error">${data.message||'Error.'}</div>`;}
 }
 
 function renderStudentsTable(){
   const tbody=document.getElementById('studentsTable');
-  if(!allStudents.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px">No students yet</td></tr>';return;}
-  tbody.innerHTML=allStudents.map(s=>{
+  const allUsers=[...allStudents,...allTeachers].sort((a,b)=>a.name.localeCompare(b.name));
+  if(!allUsers.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px">No users yet</td></tr>';return;}
+  tbody.innerHTML=allUsers.map(s=>{
+    const roleBadge=s.role==='teacher'?'<span class="teacher-badge">📚 Teacher</span>':s.role==='admin'?'<span class="badge badge-sched">⚙️ Admin</span>':'<span class="badge badge-active">🎓 Student</span>';
     const disc=allDiscounts.filter(d=>d.student_id===s.id);
     return `<tr>
-      <td><strong>${s.name}</strong></td>
+      <td><strong>${s.name}</strong>${s.subject?`<div style="font-size:11px;color:var(--muted)">${s.subject}</div>`:''}  </td>
+      <td>${roleBadge}</td>
       <td><code style="background:var(--dark);padding:2px 6px;border-radius:4px;font-size:12px">${s.username}</code></td>
       <td style="color:var(--muted)">${s.email||'—'}</td>
       <td>${s.whatsapp?`<a href="https://wa.me/${s.whatsapp.replace(/\D/g,'')}" target="_blank" style="color:#25D366;font-size:12px">📲 ${s.whatsapp}</a>`:'<span style="color:var(--muted)">—</span>'}</td>
-      <td>${disc.length?`<span class="badge badge-discount">🎁 ${disc.length}</span>`:'<span style="color:var(--muted)">—</span>'}</td>
       <td style="color:var(--muted);font-size:12px">${s.created_at?new Date(s.created_at).toLocaleDateString():'—'}</td>
-      <td><button class="btn-sm" style="color:var(--danger);border-color:var(--danger)" onclick="deleteStudent('${s.id}')">🗑</button></td>
+      <td>${s.role!=='admin'?`<button class="btn-sm" style="color:var(--danger);border-color:var(--danger)" onclick="deleteUser('${s.id}')">🗑</button>`:''}</td>
     </tr>`;
   }).join('');
 }
 
-async function deleteStudent(id){
-  if(!confirm('Delete this student?'))return;
+async function deleteUser(id){
+  if(!confirm('Delete this user?'))return;
   showLoading();await sb(`users?id=eq.${id}`,{method:'DELETE',prefer:''});
   await loadAllData();renderStudentsTable();renderLeaderboard();updateAdminStats();populateDropdowns();hideLoading();
 }
 
-// ─── IMAGE HELPER ────────────────────────────
+// ── IMAGE HELPER ─────────────────────────────
 function handleImagePick(input,previewId,hiddenId){
   const file=input.files&&input.files[0];if(!file)return;
   const reader=new FileReader();
@@ -1011,10 +959,10 @@ function handleImagePick(input,previewId,hiddenId){
   reader.readAsDataURL(file);
 }
 
-// ─── QUESTION BANK ───────────────────────────
+// ── QUESTION BANK ────────────────────────────
 function openBankModal(id){
   document.getElementById('bankQAlert').innerHTML='';
-  document.getElementById('bankModalTitle').textContent=id?'تعديل السؤال':'إضافة سؤال لبنك الأسئلة';
+  document.getElementById('bankModalTitle').textContent=id?'Edit Question':'Add Question to Bank';
   document.getElementById('bankQId').value=id||'';
   if(id){
     const q=allQuestionBank.find(q=>q.id===id);if(!q)return;
@@ -1035,14 +983,16 @@ function openBankModal(id){
     document.getElementById('bankQAudio').checked=false;
     [0,1,2,3].forEach(i=>document.getElementById(`bankQ-opt-${i}`).value='');
     document.querySelectorAll('input[name="bankQCorrect"]').forEach(r=>r.checked=false);
-    document.getElementById('bankQImagePreview').style.display='none';document.getElementById('bankQImageData').value='';
+    document.getElementById('bankQImagePreview').style.display='none';
+    document.getElementById('bankQImageData').value='';
     document.getElementById('bankQImageFile').value='';
   }
   toggleBankOptionsVisibility();
   openModal('modalBankQuestion');
 }
+
 function toggleBankOptionsVisibility(){
-  document.getElementById('bankQOptionsWrap').style.opacity=document.getElementById('bankQAudio').checked?'.45':'1';
+  document.getElementById('bankQOptionsWrap').style.opacity=document.getElementById('bankQAudio').checked?'.4':'1';
 }
 
 async function saveBankQuestion(){
@@ -1054,68 +1004,116 @@ async function saveBankQuestion(){
   const audio_required=document.getElementById('bankQAudio').checked;
   const image=document.getElementById('bankQImageData').value||null;
   const alertEl=document.getElementById('bankQAlert');
-  if(!text||!subject){alertEl.innerHTML='<div class="alert alert-error">من فضلك أدخل المادة ونص السؤال.</div>';return;}
+  if(!text||!subject){alertEl.innerHTML='<div class="alert alert-error">Subject and question text are required.</div>';return;}
   const options=[0,1,2,3].map(i=>document.getElementById(`bankQ-opt-${i}`).value.trim());
   const cr=document.querySelector('input[name="bankQCorrect"]:checked');
-  if(!audio_required&&!options.some(o=>o)){alertEl.innerHTML='<div class="alert alert-error">أدخل اختيارات الإجابة أو فعّل "إجابة صوتية".</div>';return;}
+  if(!audio_required&&!options.some(o=>o)){alertEl.innerHTML='<div class="alert alert-error">Add answer options or enable audio answer.</div>';return;}
   const payload={subject,level,points,text,options,correct:cr?parseInt(cr.value):0,audio_required,image,created_by:currentUser.id};
-  showLoading('جارِ الحفظ…');
+  showLoading('Saving…');
   let res;
   if(id)res=await sb(`question_bank?id=eq.${id}`,{method:'PATCH',body:JSON.stringify(payload)});
   else res=await sb('question_bank',{method:'POST',body:JSON.stringify({...payload,created_at:new Date().toISOString()})});
   hideLoading();
-  if(res.ok){await loadAllData();renderBankList();populateDropdowns();closeModal('modalBankQuestion');}
-  else{alertEl.innerHTML='<div class="alert alert-error">حدث خطأ أثناء الحفظ.</div>';}
+  if(res.ok){await loadAllData();renderBankList();renderTeacherBankList();populateDropdowns();closeModal('modalBankQuestion');}
+  else{alertEl.innerHTML='<div class="alert alert-error">Error saving question.</div>';}
+}
+
+function getBankData(){
+  // Teachers see only their own questions; admin sees all
+  if(currentUser.role==='admin')return allQuestionBank;
+  return allQuestionBank.filter(q=>q.created_by===currentUser.id);
 }
 
 function renderBankList(){
   const container=document.getElementById('bankList');
   const subj=document.getElementById('bankFilterSubject')?.value||'';
   const lvl=document.getElementById('bankFilterLevel')?.value||'';
-  let data=[...allQuestionBank];
+  const type=document.getElementById('bankFilterType')?.value||'';
+  const search=(document.getElementById('bankSearch')?.value||'').toLowerCase();
+  let data=allQuestionBank; // admin sees all
   if(subj)data=data.filter(q=>q.subject===subj);
   if(lvl)data=data.filter(q=>q.level===lvl);
-  if(!data.length){container.innerHTML='<div class="empty-state"><div class="icon">📚</div><p>لا توجد أسئلة بعد. ابدأ بإضافة سؤال جديد!</p></div>';return;}
+  if(type==='mcq')data=data.filter(q=>!q.audio_required);
+  if(type==='audio')data=data.filter(q=>q.audio_required);
+  if(search)data=data.filter(q=>(q.text||'').toLowerCase().includes(search)||(q.subject||'').toLowerCase().includes(search));
+  const statsEl=document.getElementById('bankStats');
+  if(statsEl)statsEl.textContent=`Showing ${data.length} of ${allQuestionBank.length} questions`;
+  if(!data.length){container.innerHTML='<div class="empty-state"><div class="icon">📚</div><p>No questions yet. Start adding!</p></div>';return;}
+  container.innerHTML=data.map(q=>{
+    const creator=[...allStudents,...allTeachers].find(u=>u.id===q.created_by)||{name:'Admin'};
+    return `<div class="bank-card">
+      <div class="tags">
+        ${q.subject?`<span class="tag-pill tag-subject">${q.subject}</span>`:''}
+        ${q.level?`<span class="tag-pill tag-level">${q.level}</span>`:''}
+        <span class="tag-pill tag-points">${q.points||1} pt${(q.points||1)>1?'s':''}</span>
+        ${q.audio_required?'<span class="tag-pill" style="border-color:var(--purple);color:var(--purple)">🎙️ Audio</span>':'<span class="tag-pill" style="border-color:var(--blue);color:var(--blue)">📝 MCQ</span>'}
+      </div>
+      <div style="font-size:14px;margin-bottom:8px;font-weight:500">${q.text}</div>
+      ${q.image?`<img src="${q.image}" class="q-img-preview"/>`:'' }
+      ${!q.audio_required&&q.options?`<div style="font-size:12px;color:var(--muted);margin-top:6px">${q.options.filter(o=>o).map((o,i)=>`<span style="margin-right:12px">${['A','B','C','D'][i]}. ${o}${i===q.correct?' ✅':''}</span>`).join('')}</div>`:''}
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+        <span style="font-size:11px;color:var(--muted)">By: ${creator.name}</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn-sm" onclick="openBankModal('${q.id}')">✏️ Edit</button>
+          <button class="btn-sm" style="color:var(--danger);border-color:var(--danger)" onclick="deleteBankQuestion('${q.id}')">🗑</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderTeacherBankList(){
+  const container=document.getElementById('teacherBankList');if(!container)return;
+  const subj=document.getElementById('tBankFilterSubject')?.value||'';
+  const lvl=document.getElementById('tBankFilterLevel')?.value||'';
+  const search=(document.getElementById('tBankSearch')?.value||'').toLowerCase();
+  let data=getBankData();
+  if(subj)data=data.filter(q=>q.subject===subj);
+  if(lvl)data=data.filter(q=>q.level===lvl);
+  if(search)data=data.filter(q=>(q.text||'').toLowerCase().includes(search));
+  if(!data.length){container.innerHTML='<div class="empty-state"><div class="icon">📚</div><p>No questions yet.</p></div>';return;}
   container.innerHTML=data.map(q=>`
     <div class="bank-card">
       <div class="tags">
         ${q.subject?`<span class="tag-pill tag-subject">${q.subject}</span>`:''}
         ${q.level?`<span class="tag-pill tag-level">${q.level}</span>`:''}
-        <span class="tag-pill tag-points">${q.points||1} درجة</span>
-        ${q.audio_required?'<span class="tag-pill" style="border-color:var(--purple);color:var(--purple)">🎙️ إجابة صوتية</span>':''}
+        <span class="tag-pill tag-points">${q.points||1} pt${(q.points||1)>1?'s':''}</span>
+        ${q.audio_required?'<span class="tag-pill" style="border-color:var(--purple);color:var(--purple)">🎙️ Audio</span>':''}
       </div>
       <div style="font-size:14px;margin-bottom:8px">${q.text}</div>
-      ${q.image?`<img src="${q.image}" class="q-img-preview"/>`:''}
+      ${q.image?`<img src="${q.image}" class="q-img-preview"/>`:'' }
       <div style="display:flex;gap:8px;margin-top:10px">
-        <button class="btn-sm" onclick="openBankModal('${q.id}')">✏️ تعديل</button>
-        <button class="btn-sm" style="color:var(--danger);border-color:var(--danger)" onclick="deleteBankQuestion('${q.id}')">🗑 حذف</button>
+        <button class="btn-sm" onclick="openBankModal('${q.id}')">✏️ Edit</button>
+        <button class="btn-sm" style="color:var(--danger);border-color:var(--danger)" onclick="deleteBankQuestion('${q.id}')">🗑</button>
       </div>
     </div>`).join('');
 }
 
 async function deleteBankQuestion(id){
-  if(!confirm('حذف هذا السؤال من بنك الأسئلة؟'))return;
+  if(!confirm('Delete this question from the bank?'))return;
   showLoading();await sb(`question_bank?id=eq.${id}`,{method:'DELETE',prefer:''});
-  allQuestionBank=allQuestionBank.filter(q=>q.id!==id);renderBankList();hideLoading();
+  allQuestionBank=allQuestionBank.filter(q=>q.id!==id);renderBankList();renderTeacherBankList();hideLoading();
 }
 
 function renderBankPicker(){
-  const container=document.getElementById('bankPickerList');
+  const container=document.getElementById('bankPickerList');if(!container)return;
   const subj=document.getElementById('pickBankSubject')?.value||'';
   const lvl=document.getElementById('pickBankLevel')?.value||'';
-  let data=[...allQuestionBank];
+  const search=(document.getElementById('pickBankSearch')?.value||'').toLowerCase();
+  let data=allQuestionBank;
   if(subj)data=data.filter(q=>q.subject===subj);
   if(lvl)data=data.filter(q=>q.level===lvl);
-  if(!data.length){container.innerHTML='<div class="text-muted" style="font-size:12px;padding:8px">لا توجد أسئلة مطابقة</div>';return;}
+  if(search)data=data.filter(q=>(q.text||'').toLowerCase().includes(search));
+  if(!data.length){container.innerHTML='<div class="text-muted" style="font-size:12px;padding:8px">No matching questions</div>';return;}
   container.innerHTML=data.map(q=>`
     <label class="bank-pick-row">
       <input type="checkbox" class="bankPickChk" value="${q.id}"/>
-      <div>
-        <div style="font-size:13px">${q.text}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:500">${q.text}</div>
         <div class="tags" style="margin-top:4px">
           ${q.subject?`<span class="tag-pill tag-subject">${q.subject}</span>`:''}
           ${q.level?`<span class="tag-pill tag-level">${q.level}</span>`:''}
-          <span class="tag-pill tag-points">${q.points||1} درجة</span>
+          <span class="tag-pill tag-points">${q.points||1} pt</span>
           ${q.audio_required?'<span class="tag-pill" style="border-color:var(--purple);color:var(--purple)">🎙️</span>':''}
         </div>
       </div>
@@ -1124,14 +1122,29 @@ function renderBankPicker(){
 
 function addSelectedBankQuestions(){
   const checked=[...document.querySelectorAll('.bankPickChk:checked')].map(c=>c.value);
-  checked.forEach(id=>{
-    const q=allQuestionBank.find(q=>q.id===id);if(!q)return;
-    addQuestion(q);
-  });
+  if(!checked.length){alert('Please select at least one question.');return;}
+  checked.forEach(id=>{const q=allQuestionBank.find(q=>q.id===id);if(q)addQuestion(q);});
   document.querySelectorAll('.bankPickChk:checked').forEach(c=>c.checked=false);
 }
 
-// ─── EXAMS ──────────────────────────────────
+// ── EXAMS ────────────────────────────────────
+function openCreateExamModal(){
+  questionCount=0;
+  document.getElementById('questionsBuilder').innerHTML='';
+  document.getElementById('createExamAlert').innerHTML='';
+  populateDropdowns();renderBankPicker();
+  document.getElementById('examAssignAll').checked=true;toggleAssignAll();
+  document.getElementById('examTitle').value='';
+  document.getElementById('examSubject').value='';
+  document.getElementById('examLevel').value='';
+  document.getElementById('examDesc').value='';
+  document.getElementById('examDuration').value=30;
+  document.getElementById('examPass').value=60;
+  document.getElementById('examResultMode').value='auto';
+  addQuestion();
+  openModal('modalCreateExam');
+}
+
 function addQuestion(fromBank){
   questionCount++;const idx=questionCount;
   const div=document.createElement('div');div.className='question-builder';div.id=`qb-${idx}`;
@@ -1142,36 +1155,43 @@ function addQuestion(fromBank){
   const qAudio=fromBank?!!fromBank.audio_required:false;
   const qOpts=fromBank?(fromBank.options||['','','','']):['','','',''];
   const qCorrect=fromBank?(fromBank.correct||0):0;
-  div.innerHTML=`<div class="q-num">Question ${idx} ${bankId?'<span style="color:var(--muted)">(من بنك الأسئلة)</span>':''}</div>
+  div.innerHTML=`<div class="q-num">Question ${idx}${bankId?' <span style="color:var(--muted);font-size:10px">(from bank)</span>':''}</div>
     <input type="hidden" id="q-bankid-${idx}" value="${bankId}"/>
-    <button class="del-q-btn" onclick="removeQuestion(${idx})">✕</button>
-    <div class="field" style="margin-bottom:12px"><input type="text" id="q-text-${idx}" placeholder="Enter question text…" value="${qText.replace(/"/g,'&quot;')}"/></div>
-    <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
-      <div style="font-size:12px;color:var(--muted)">درجة السؤال:</div>
-      <input type="number" id="q-points-${idx}" value="${qPoints}" min="0.5" step="0.5" style="width:80px;background:#FFFFFF;border:2px solid var(--border);border-radius:6px;padding:6px 8px;font-size:13px"/>
-      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)">
-        <input type="checkbox" id="q-audio-${idx}" style="width:auto" ${qAudio?'checked':''} onchange="toggleQuestionAudio(${idx})"/> 🎙️ إجابة صوتية (تصحيح يدوي)
+    <button class="del-q-btn" onclick="removeQuestion(${idx})">✕ Remove</button>
+    <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+      <div style="flex:1;min-width:200px"><label style="font-size:11px;color:var(--muted)">QUESTION TEXT</label>
+        <input type="text" id="q-text-${idx}" placeholder="Enter question text…" value="${qText.replace(/"/g,'&quot;')}" style="width:100%;background:#fff;border:2px solid var(--border);border-radius:6px;padding:8px 10px;font-size:13px;margin-top:4px"/>
+      </div>
+      <div style="width:90px"><label style="font-size:11px;color:var(--muted)">POINTS</label>
+        <input type="number" id="q-points-${idx}" value="${qPoints}" min="0.5" step="0.5" style="width:100%;background:#fff;border:2px solid var(--border);border-radius:6px;padding:8px;font-size:13px;margin-top:4px"/>
+      </div>
+    </div>
+    <div style="margin-bottom:10px">
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer">
+        <input type="checkbox" id="q-audio-${idx}" style="width:auto" ${qAudio?'checked':''} onchange="toggleQuestionAudio(${idx})"/> 🎙️ Audio answer (manual grading)
       </label>
     </div>
-    <div class="field" style="margin-bottom:10px">
-      <input type="file" accept="image/*" id="q-imgfile-${idx}" onchange="handleImagePick(this,'q-imgprev-${idx}','q-img-${idx}')"/>
+    <div style="margin-bottom:10px">
+      <label style="font-size:11px;color:var(--muted)">ATTACH IMAGE (optional)</label>
+      <div style="margin-top:4px"><input type="file" accept="image/*" id="q-imgfile-${idx}" onchange="handleImagePick(this,'q-imgprev-${idx}','q-img-${idx}')"/>
       <input type="hidden" id="q-img-${idx}" value="${qImage}"/>
-      <img id="q-imgprev-${idx}" class="q-img-preview" src="${qImage}" style="display:${qImage?'block':'none'}"/>
+      <img id="q-imgprev-${idx}" class="q-img-preview" src="${qImage}" style="display:${qImage?'block':'none'}"/></div>
     </div>
     <div id="q-opts-${idx}">
-    ${['A','B','C','D'].map((l,li)=>`<div class="option-input">
-      <input type="radio" name="correct-${idx}" value="${li}" id="r-${idx}-${li}" ${li===qCorrect?'checked':''}/>
-      <label for="r-${idx}-${li}">${l}</label>
-      <input type="text" id="q-opt-${idx}-${li}" placeholder="Option ${l}…" value="${(qOpts[li]||'').replace(/"/g,'&quot;')}"/>
-    </div>`).join('')}
-    </div>
-    <div style="font-size:11px;color:var(--muted);margin-top:8px">☝️ Select radio = correct answer</div>`;
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px">SELECT CORRECT ANSWER ☝️</div>
+      ${['A','B','C','D'].map((l,li)=>`<div class="option-input">
+        <input type="radio" name="correct-${idx}" value="${li}" id="r-${idx}-${li}" ${li===qCorrect?'checked':''}/>
+        <label for="r-${idx}-${li}">${l}</label>
+        <input type="text" id="q-opt-${idx}-${li}" placeholder="Option ${l}…" value="${(qOpts[li]||'').replace(/"/g,'&quot;')}"/>
+      </div>`).join('')}
+    </div>`;
   document.getElementById('questionsBuilder').appendChild(div);
   toggleQuestionAudio(idx);
 }
+
 function toggleQuestionAudio(idx){
   const on=document.getElementById(`q-audio-${idx}`).checked;
-  document.getElementById(`q-opts-${idx}`).style.opacity=on?'.45':'1';
+  document.getElementById(`q-opts-${idx}`).style.opacity=on?'.4':'1';
 }
 function removeQuestion(idx){const el=document.getElementById(`qb-${idx}`);if(el)el.remove();}
 
@@ -1182,8 +1202,9 @@ async function saveExam(){
   const duration=parseInt(document.getElementById('examDuration').value);
   const pass=parseInt(document.getElementById('examPass').value);
   const desc=document.getElementById('examDesc').value.trim();
+  const resultMode=document.getElementById('examResultMode').value;
   const alertEl=document.getElementById('createExamAlert');
-  if(!title||!duration){alertEl.innerHTML='<div class="alert alert-error">Title and duration required.</div>';return;}
+  if(!title||!duration){alertEl.innerHTML='<div class="alert alert-error">Title and duration are required.</div>';return;}
   const questions=[];
   document.querySelectorAll('.question-builder').forEach(qb=>{
     const idx=qb.id.replace('qb-','');
@@ -1199,51 +1220,76 @@ async function saveExam(){
   if(!questions.length){alertEl.innerHTML='<div class="alert alert-error">Add at least one question.</div>';return;}
   const assignAll=document.getElementById('examAssignAll').checked;
   const assigned_students=assignAll?[]:[...document.querySelectorAll('.examStudentChk:checked')].map(c=>c.value);
-  const auto_grade=!questions.some(q=>q.audio_required);
+  // auto_grade: false if resultMode=manual OR has audio questions
+  const hasAudio=questions.some(q=>q.audio_required);
+  const auto_grade=resultMode==='auto'&&!hasAudio;
   showLoading('Saving exam…');
-  const res=await sb('exams',{method:'POST',body:JSON.stringify({title,subject,level,duration_minutes:duration,passing_score:pass,description:desc,questions,is_active:true,assigned_students,auto_grade,created_at:new Date().toISOString()})});
-  const data=await res.json();hideLoading();
+  const res=await sb('exams',{method:'POST',body:JSON.stringify({
+    title,subject,level,duration_minutes:duration,passing_score:pass,description:desc,
+    questions,is_active:true,assigned_students,auto_grade,
+    result_mode:resultMode,created_by:currentUser.id,created_at:new Date().toISOString()
+  })});
+  const data=await res.json();
+  // Auto-save NEW questions (not from bank) to question bank
   if(res.ok){
-    allExams.unshift(data[0]||data);
-    // Auto-add brand-new (non-bank) questions to the question bank
     const newOnes=questions.filter(q=>!q.bank_id);
     if(newOnes.length){
-      showLoading('جارِ إضافة الأسئلة لبنك الأسئلة…');
+      showLoading('Saving new questions to bank…');
       await Promise.all(newOnes.map(q=>sb('question_bank',{method:'POST',body:JSON.stringify({
         subject,level,points:q.points,text:q.text,options:q.options,correct:q.correct,
-        audio_required:q.audio_required,image:q.image,created_by:currentUser.id,created_at:new Date().toISOString()
+        audio_required:q.audio_required,image:q.image,created_by:currentUser.id,
+        created_at:new Date().toISOString()
       })})));
-      await loadAllData();hideLoading();
     }
-    renderAdminExams();updateAdminStats();populateDropdowns();closeModal('modalCreateExam');
-    document.getElementById('examTitle').value='';document.getElementById('examDesc').value='';document.getElementById('examLevel').value='';
-    document.getElementById('questionsBuilder').innerHTML='';questionCount=0;
-    document.getElementById('examAssignAll').checked=true;toggleAssignAll();
-  }else{alertEl.innerHTML=`<div class="alert alert-error">${data.message||'Error saving exam.'}</div>`;}
+    await loadAllData();hideLoading();
+    renderAdminExams();renderTeacherExamList();updateAdminStats();populateDropdowns();
+    closeModal('modalCreateExam');
+  }else{hideLoading();alertEl.innerHTML=`<div class="alert alert-error">${data.message||'Error saving exam.'}</div>`;}
 }
 
 function renderAdminExams(){
-  const container=document.getElementById('adminExamList');
+  const container=document.getElementById('adminExamList');if(!container)return;
   if(!allExams.length){container.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="icon">📋</div><p>No exams yet</p></div>';return;}
   container.innerHTML=allExams.map(e=>{
     const attempts=allResults.filter(r=>r.exam_id===e.id).length;
     const sched=allSchedules.filter(s=>s.exam_id===e.id);
+    const creator=[...allTeachers,{id:null,name:'Admin'}].find(t=>t.id===e.created_by)||{name:'Admin'};
     return `<div class="card">
       <div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:8px">
         <div class="card-title">${e.title}</div>
         <span class="badge ${e.is_active?'badge-active':'badge-draft'}">${e.is_active?'Active':'Draft'}</span>
       </div>
-      <div class="card-meta">${e.subject||''}${e.level?' • '+e.level:''} • ⏱ ${e.duration_minutes} min • ${(e.questions||[]).length} Qs • ${attempts} attempts</div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:12px">${e.description||''}</div>
+      <div class="card-meta">${e.subject||''}${e.level?' • '+e.level:''} • ⏱ ${e.duration_minutes}min • ${(e.questions||[]).length} Qs • ${attempts} attempts</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px">By: ${creator.name}</div>
       <div style="font-size:11px;margin-bottom:8px">
-        ${(e.assigned_students&&e.assigned_students.length)?`<span class="badge badge-sched">👥 ${e.assigned_students.length} طالب محدد</span>`:'<span class="badge badge-active">👥 متاح للجميع</span>'}
-        ${e.auto_grade===false?'<span class="badge badge-manual">✏️ يحتاج تصحيح يدوي</span>':''}
+        ${e.auto_grade===false||e.result_mode==='manual'?'<span class="badge badge-manual">✏️ Manual grading</span>':'<span class="badge badge-active">⚡ Auto result</span>'}
+        ${e.assigned_students&&e.assigned_students.length?`<span class="badge badge-sched" style="margin-left:4px">👥 ${e.assigned_students.length} assigned</span>`:'<span class="badge badge-active" style="margin-left:4px">👥 All students</span>'}
       </div>
       ${sched.length?`<div style="font-size:11px;color:var(--gold);margin-bottom:10px">🗓️ ${sched.length} schedule(s)</div>`:''}
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn-sm" onclick="toggleExamActive('${e.id}',${!e.is_active})">${e.is_active?'⏸ Deactivate':'▶ Activate'}</button>
         <button class="btn-sm" style="color:var(--danger);border-color:var(--danger)" onclick="deleteExam('${e.id}')">🗑</button>
       </div>
+    </div>`;
+  }).join('');
+}
+
+function renderTeacherExamList(){
+  const container=document.getElementById('teacherExamList');if(!container)return;
+  const myExams=allExams.filter(e=>e.created_by===currentUser.id);
+  if(!myExams.length){container.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="icon">📋</div><p>No exams created yet</p></div>';return;}
+  container.innerHTML=myExams.map(e=>{
+    const attempts=allResults.filter(r=>r.exam_id===e.id).length;
+    return `<div class="card">
+      <div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:8px">
+        <div class="card-title">${e.title}</div>
+        <span class="badge ${e.is_active?'badge-active':'badge-draft'}">${e.is_active?'Active':'Draft'}</span>
+      </div>
+      <div class="card-meta">${e.subject||''}${e.level?' • '+e.level:''} • ⏱ ${e.duration_minutes}min • ${(e.questions||[]).length} Qs • ${attempts} attempts</div>
+      <div style="font-size:11px;margin-bottom:10px">
+        ${e.auto_grade===false||e.result_mode==='manual'?'<span class="badge badge-manual">✏️ Manual grading</span>':'<span class="badge badge-active">⚡ Auto result</span>'}
+      </div>
+      <button class="btn-sm" onclick="openTeacherResultsForExam('${e.id}')">📊 View Results</button>
     </div>`;
   }).join('');
 }
@@ -1257,7 +1303,7 @@ async function deleteExam(id){
   await sb(`exams?id=eq.${id}`,{method:'DELETE',prefer:''});await loadAllData();renderAdminExams();updateAdminStats();hideLoading();
 }
 
-// ─── SCHEDULE ───────────────────────────────
+// ── SCHEDULE ─────────────────────────────────
 async function saveSchedule(){
   const examId=document.getElementById('schedExam').value;
   const opensAt=document.getElementById('schedOpen').value;
@@ -1274,7 +1320,7 @@ async function saveSchedule(){
 }
 
 function renderScheduleList(){
-  const container=document.getElementById('scheduleList');
+  const container=document.getElementById('scheduleList');if(!container)return;
   if(!allSchedules.length){container.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="icon">🗓️</div><p>No schedules yet</p></div>';return;}
   const now=new Date();
   container.innerHTML=allSchedules.map(s=>{
@@ -1321,32 +1367,18 @@ async function deleteSchedule(id){
   allSchedules=allSchedules.filter(s=>s.id!==id);renderScheduleList();hideLoading();
 }
 
-// ─── WHATSAPP NOTIFICATIONS ──────────────────
+// ── WHATSAPP ─────────────────────────────────
 function buildWAScheduleMsg(scheduleId){
   const s=allSchedules.find(s=>s.id===scheduleId);if(!s)return'';
   const ex=allExams.find(e=>e.id===s.exam_id)||{title:'Exam',duration_minutes:30,questions:[]};
   const opens=new Date(s.opens_at),closes=new Date(s.closes_at);
-  return `📚 *MY Institute – Exam Reminder*\n\n` +
-    `Assalamu Alaikum,\n\n` +
-    `You have an upcoming exam:\n\n` +
-    `📝 *${ex.title}*\n` +
-    `🟡 Opens: ${opens.toLocaleString()}\n` +
-    `🔴 Closes: ${closes.toLocaleString()}\n` +
-    `⏱ Duration: ${ex.duration_minutes} minutes\n` +
-    `❓ Questions: ${(ex.questions||[]).length}\n` +
-    (s.notes?`\n📌 ${s.notes}\n`:'')+
-    `\nPlease log in to the exam portal and complete your exam on time.\n\n` +
-    `Jazakum Allah Khayran 🌙\n*MY Institute*`;
+  return `📚 *MY Institute – Exam Reminder*\n\nAssalamu Alaikum,\n\nYou have an upcoming exam:\n\n📝 *${ex.title}*\n🟡 Opens: ${opens.toLocaleString()}\n🔴 Closes: ${closes.toLocaleString()}\n⏱ Duration: ${ex.duration_minutes} minutes\n❓ Questions: ${(ex.questions||[]).length}\n${s.notes?'\n📌 '+s.notes+'\n':''}\nPlease log in to the exam portal on time.\n\nJazakum Allah Khayran 🌙\n*MY Institute*`;
 }
 
 function openWAForSchedule(schedId){
   const s=allSchedules.find(s=>s.id===schedId);if(!s)return;
-  // Default open with message, no number (admin pastes manually or picks student)
-  const msg=buildWAScheduleMsg(schedId);
   document.getElementById('waBlastExam').value=s.exam_id;
-  updateWAPreview();
-  switchAdminTab('schedule');
-  // scroll to WA section
+  updateWAPreview();switchAdminTab('schedule');
   setTimeout(()=>document.getElementById('waPreview').scrollIntoView({behavior:'smooth'}),200);
 }
 
@@ -1365,13 +1397,12 @@ function sendWABlast(){
     const s=allStudents.find(s=>s.id===studentSel);
     if(s&&s.whatsapp){window.open(`https://wa.me/${s.whatsapp.replace(/\D/g,'')}?text=${encodeURIComponent(msg)}`,'_blank');return;}
   }
-  // Open WhatsApp with message (no number = user selects recipient)
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
 }
 
 function copyWAMessage(){
   const msg=document.getElementById('waPreview').textContent;
-  navigator.clipboard.writeText(msg).then(()=>alert('Message copied! Paste it in WhatsApp.'));
+  navigator.clipboard.writeText(msg).then(()=>alert('Message copied!'));
 }
 
 function sendDiscountViaWA(){
@@ -1379,65 +1410,93 @@ function sendDiscountViaWA(){
   const code=document.getElementById('discountCode').value.trim().toUpperCase();
   const value=document.getElementById('discountValue').value.trim();
   const msg2=document.getElementById('discountMsg').value.trim();
-  if(!studentId||!code){alert('Please fill student and code first.');return;}
+  if(!studentId||!code){alert('Please fill student and code.');return;}
   const s=allStudents.find(s=>s.id===studentId);
   const waMsg=`🎁 *Special Gift from MY Institute*\n\nAssalamu Alaikum ${s?s.name:''}!\n\n${msg2||'Congratulations on your excellent performance!'}\n\n🏷️ Your discount code: *${code}*\n💰 Value: ${value}\n\nJazakum Allah Khayran 🌙\n*MY Institute*`;
   const waNum=s&&s.whatsapp?s.whatsapp.replace(/\D/g,''):'';
   window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(waMsg)}`,'_blank');
 }
 
-// ─── RESULTS ────────────────────────────────
+// ── RESULTS ──────────────────────────────────
 function renderResultsTable(){
-  const tbody=document.getElementById('resultsTable');
+  const tbody=document.getElementById('resultsTable');if(!tbody)return;
   let data=[...allResults];
   const ef=document.getElementById('filterExam').value;
   const sf=document.getElementById('filterStudent').value;
   if(ef)data=data.filter(r=>r.exam_id===ef);
   if(sf)data=data.filter(r=>r.student_id===sf);
   data.sort((a,b)=>new Date(b.submitted_at)-new Date(a.submitted_at));
-  if(!data.length){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:32px">No results found</td></tr>';return;}
+  if(!data.length){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:32px">No results found</td></tr>';return;}
   tbody.innerHTML=data.map(r=>{
     const s=allStudents.find(s=>s.id===r.student_id)||{name:'Unknown'};
     const ex=allExams.find(e=>e.id===r.exam_id)||{title:'Unknown'};
     const pending=r.graded===false;
-    const pct=pending?null:Math.round(r.score);const grade=pending?'':(getGrade(pct).split(' ')[1]||'');
+    const pct=pending?null:Math.round(r.score);
     const mins=r.time_used_seconds?`${Math.floor(r.time_used_seconds/60)}m ${r.time_used_seconds%60}s`:'—';
     let dt=r.submitted_at||'';try{dt=new Date(dt).toLocaleString();}catch{}
     return `<tr>
       <td><strong>${s.name}</strong></td><td>${ex.title}</td>
-      <td>${pending?'<span class="badge badge-pending">⏳ قيد التصحيح</span>':'<span class="badge badge-active">✔ تم التصحيح</span>'}</td>
+      <td>${pending?'<span class="badge badge-pending">⏳ Pending</span>':'<span class="badge badge-active">✔ Graded</span>'}</td>
       <td>${pending?'—':`<span style="color:${pct>=60?'var(--success)':'var(--danger)'};font-weight:600">${pct}%</span>`}</td>
-      <td>${grade}</td><td style="color:var(--muted)">${mins}</td>
+      <td>${pending?'—':(getGrade(pct).split(' ')[1]||'')}</td>
+      <td style="color:var(--muted)">${mins}</td>
       <td style="color:var(--muted);font-size:12px">${dt}</td>
       <td style="font-size:12px;color:var(--gold-pale)">${r.admin_note||'<span style="color:var(--muted)">—</span>'}</td>
       <td style="display:flex;gap:6px;flex-wrap:wrap">
-        ${pending?`<button class="btn-sm btn-wa" style="background:#2980b9" onclick="openManualGradeModal('${r.id}')">✏️ تصحيح</button>`:''}
-        <button class="btn-sm" onclick="openGradeModal('${r.id}','${(r.admin_note||'').replace(/'/g,"\\'")}')">✏️</button>
+        ${pending?`<button class="btn-sm" style="background:#2980b9;color:#fff;border-color:#2980b9" onclick="openManualGradeModal('${r.id}')">✏️ Grade</button>`:''}
+        <button class="btn-sm" onclick="openGradeModal('${r.id}','${(r.admin_note||'').replace(/'/g,"\\'")}')">📝 Note</button>
       </td>
     </tr>`;
   }).join('');
 }
 
-// ─── MANUAL GRADING (audio / pending questions) ──
+function renderTeacherResultsTable(filterExamId){
+  const tbody=document.getElementById('teacherResultsTable');if(!tbody)return;
+  const myExamIds=allExams.filter(e=>e.created_by===currentUser.id).map(e=>e.id);
+  let data=allResults.filter(r=>myExamIds.includes(r.exam_id));
+  if(filterExamId)data=data.filter(r=>r.exam_id===filterExamId);
+  if(!data.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:32px">No results for your exams</td></tr>';return;}
+  tbody.innerHTML=data.map(r=>{
+    const s=allStudents.find(s=>s.id===r.student_id)||{name:'Unknown'};
+    const ex=allExams.find(e=>e.id===r.exam_id)||{title:'Unknown'};
+    const pending=r.graded===false;
+    const pct=pending?null:Math.round(r.score);
+    let dt=r.submitted_at||'';try{dt=new Date(dt).toLocaleDateString();}catch{}
+    return `<tr>
+      <td><strong>${s.name}</strong></td><td>${ex.title}</td>
+      <td>${pending?'<span class="badge badge-pending">⏳ Pending</span>':'<span class="badge badge-active">✔ Graded</span>'}</td>
+      <td>${pending?'—':`<span style="color:${pct>=60?'var(--success)':'var(--danger)'};font-weight:600">${pct}%</span>`}</td>
+      <td>${pending?'—':(getGrade(pct).split(' ')[1]||'')}</td>
+      <td style="color:var(--muted);font-size:12px">${dt}</td>
+      <td>${pending?`<button class="btn-sm" style="background:#2980b9;color:#fff;border-color:#2980b9" onclick="openManualGradeModal('${r.id}')">✏️ Grade</button>`:'<span style="color:var(--muted)">—</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function openTeacherResultsForExam(examId){
+  switchTeacherTab('results');renderTeacherResultsTable(examId);
+}
+
+// ── MANUAL GRADING ────────────────────────────
 function openManualGradeModal(resultId){
   const r=allResults.find(r=>r.id===resultId);if(!r)return;
   const ex=allExams.find(e=>e.id===r.exam_id);if(!ex)return;
   document.getElementById('gmResultId').value=resultId;
   document.getElementById('gmAlert').innerHTML='';
   const pending=r.pending_manual||[];
-  document.getElementById('gmQuestionsList').innerHTML=pending.map(pm=>{
+  document.getElementById('gmQuestionsList').innerHTML=pending.length?pending.map(pm=>{
     const q=ex.questions[pm.index]||{};
     const audio=(r.audio_answers||{})[pm.index];
     return `<div class="question-builder">
-      <div class="q-num">Question ${pm.index+1} — من ${pm.maxPoints} درجة</div>
-      <div style="margin-bottom:10px">${q.text||''}</div>
-      ${q.image?`<img src="${q.image}" class="q-img-preview"/>`:''}
-      ${audio?`<audio controls src="${audio}" style="width:100%;margin:8px 0"></audio>`:'<div class="text-muted" style="font-size:12px">لم يقم الطالب بتسجيل إجابة صوتية.</div>'}
-      <div class="field" style="margin-top:8px"><label>الدرجة الممنوحة</label>
+      <div class="q-num">Question ${pm.index+1} — max ${pm.maxPoints} pts</div>
+      <div style="margin-bottom:10px;font-weight:500">${q.text||''}</div>
+      ${q.image?`<img src="${q.image}" class="q-img-preview"/>`:'' }
+      ${audio?`<audio controls src="${audio}" style="width:100%;margin:8px 0"></audio>`:'<div class="text-muted" style="font-size:12px">No audio recorded.</div>'}
+      <div class="field" style="margin-top:8px"><label>Points awarded</label>
         <input type="number" class="gmPointsInput" data-idx="${pm.index}" data-max="${pm.maxPoints}" min="0" max="${pm.maxPoints}" step="0.5" value="0"/>
       </div>
     </div>`;
-  }).join('')||'<div class="text-muted">لا توجد أسئلة معلقة لهذه النتيجة.</div>';
+  }).join(''):'<div class="text-muted">No pending questions.</div>';
   openModal('modalGradeManual');
 }
 
@@ -1454,14 +1513,14 @@ async function publishManualGrade(){
   const earnedPoints=(r.earned_points||0)+manualEarned;
   const score=(earnedPoints/totalPoints)*100;
   const passed=score>=(ex.passing_score||60);
-  showLoading('جارِ نشر النتيجة…');
+  showLoading('Publishing result…');
   await sb(`results?id=eq.${resultId}`,{method:'PATCH',body:JSON.stringify({score,passed,graded:true,earned_points:earnedPoints})});
   await sb('notifications',{method:'POST',body:JSON.stringify({
     student_id:r.student_id,exam_id:r.exam_id,
-    message:`🎉 نتيجتك في امتحان "${ex.title}" أصبحت متاحة الآن! درجتك: ${Math.round(score)}%`,
+    message:`🎉 Your result for "${ex.title}" is now available! Score: ${Math.round(score)}%`,
     read:false,created_at:new Date().toISOString()
   })});
-  await loadAllData();hideLoading();closeModal('modalGradeManual');renderResultsTable();
+  await loadAllData();hideLoading();closeModal('modalGradeManual');renderResultsTable();renderTeacherResultsTable();
 }
 
 function openGradeModal(id,note){document.getElementById('gradeResultId').value=id;document.getElementById('gradeNote').value=note;openModal('modalGrade');}
@@ -1472,7 +1531,7 @@ async function saveGrade(){
   const r=allResults.find(r=>r.id===id);if(r)r.admin_note=note;renderResultsTable();closeModal('modalGrade');hideLoading();
 }
 
-// ─── DISCOUNTS ──────────────────────────────
+// ── DISCOUNTS ─────────────────────────────────
 async function sendDiscount(){
   const studentId=document.getElementById('discountStudent').value;
   const code=document.getElementById('discountCode').value.trim().toUpperCase();
@@ -1483,15 +1542,16 @@ async function sendDiscount(){
   showLoading('Sending gift…');
   const res=await sb('discounts',{method:'POST',body:JSON.stringify({student_id:studentId,code,value,message:msg,used:false,created_at:new Date().toISOString()})});
   hideLoading();
-  if(res.ok){await loadAllData();renderDiscountsTable();renderLeaderboard();
+  if(res.ok){
+    await loadAllData();renderDiscountsTable();renderLeaderboard();
     alertEl.innerHTML='<div class="alert alert-success">🎁 Gift sent!</div>';
     document.getElementById('discountCode').value='';document.getElementById('discountValue').value='';document.getElementById('discountMsg').value='';
-    setTimeout(()=>alertEl.innerHTML='',3000);}
-  else{alertEl.innerHTML='<div class="alert alert-error">Error sending gift.</div>';}
+    setTimeout(()=>alertEl.innerHTML='',3000);
+  }else{alertEl.innerHTML='<div class="alert alert-error">Error sending gift.</div>';}
 }
 
 function renderDiscountsTable(){
-  const tbody=document.getElementById('discountsTable');
+  const tbody=document.getElementById('discountsTable');if(!tbody)return;
   if(!allDiscounts.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">No gifts yet</td></tr>';return;}
   tbody.innerHTML=allDiscounts.map(d=>{
     const s=allStudents.find(s=>s.id===d.student_id)||{name:'Unknown'};
@@ -1504,53 +1564,54 @@ function renderDiscountsTable(){
   }).join('');
 }
 
-// ─── AVAILABLE EXAMS (STUDENT) ───────────────
+// ── AVAILABLE EXAMS (student) ─────────────────
 function renderAvailableExams(){
-  const container=document.getElementById('availableExamsList');
+  const container=document.getElementById('availableExamsList');if(!container)return;
   const now=new Date();
   const active=allExams.filter(e=>{
     if(!e.is_active)return false;
-    // Assignment check: empty/absent list = open to all
     if(e.assigned_students&&e.assigned_students.length&&!e.assigned_students.includes(currentUser.id))return false;
-    // Check if there's an open schedule window
     const sched=allSchedules.find(s=>s.exam_id===e.id&&new Date(s.opens_at)<=now&&new Date(s.closes_at)>=now);
     const hasSched=allSchedules.some(s=>s.exam_id===e.id);
-    return !hasSched||!!sched; // if no schedule, always show; if schedule exists, only show if open
+    return !hasSched||!!sched;
   });
   if(!active.length){container.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="icon">📝</div><p>No exams available right now.<br><span style="font-size:13px">Check back soon!</span></p></div>';return;}
+  const icons=['📖','✍️','☪️','🌙','⭐','📝'];
+  const borders=['#1565C0','#16A34A','#0EA5E9','#4F46E5','#059669','#0891B2'];
+  const bgs=['#EAF6FF','#E8F5E9','#E0F7FA','#EEF2FF','#E6FFFA','#F0FFF4'];
   container.innerHTML=active.map((e,idx)=>{
     const myRes=allResults.filter(r=>r.student_id===currentUser.id&&r.exam_id===e.id);
-    const best=myRes.length?Math.max(...myRes.map(r=>r.score)):null;
+    const best=myRes.filter(r=>r.graded!==false).length?Math.max(...myRes.filter(r=>r.graded!==false).map(r=>r.score)):null;
     const sched=allSchedules.find(s=>s.exam_id===e.id&&new Date(s.opens_at)<=now&&new Date(s.closes_at)>=now);
-    const icons=['📖','✍️','☪️','🌙','⭐','📝'];
-    const colors=['#EAF6FF','#E8F5E9','#E0F7FA','#EEF2FF','#E6FFFA','#F0FFF4'];
-    const borders=['#1565C0','#16A34A','#0EA5E9','#4F46E5','#059669','#0891B2'];
     const doneToday=myRes.some(r=>(r.submitted_at||'').slice(0,10)===todayStr());
     const pendingMine=myRes.some(r=>r.graded===false);
-    return `<div class="card" style="border-top:4px solid ${borders[idx%6]};background:${colors[idx%6]}">
+    return `<div class="card" style="border-top:4px solid ${borders[idx%6]};background:${bgs[idx%6]}">
       <div style="font-size:36px;margin-bottom:10px">${icons[idx%6]}</div>
       <div class="card-title">${e.title}</div>
       <div class="card-meta">${e.subject||''}${e.level?' • '+e.level:''} • ⏱ ${e.duration_minutes} min • ${(e.questions||[]).length} questions</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:12px">${e.description||''}</div>
       ${sched?`<div style="font-size:11px;color:var(--success);margin-bottom:10px">🟢 Open until ${new Date(sched.closes_at).toLocaleString()}</div>`:''}
-      ${pendingMine?`<div class="alert alert-info" style="margin-bottom:10px;font-size:12px">⏳ نتيجة سابقة قيد التصحيح</div>`:''}
+      ${pendingMine?`<div class="alert alert-info" style="margin-bottom:10px;font-size:12px">⏳ A previous result is pending grading</div>`:''}
       ${best!==null?`<div class="alert alert-info" style="margin-bottom:10px;font-size:12px">Best score: <strong>${Math.round(best)}%</strong></div>`:''}
-      ${doneToday?`<button class="btn btn-ghost" disabled>✅ تم أداء الامتحان اليوم</button>`:`<button class="btn btn-primary" onclick="startExam('${e.id}')">Start Exam →</button>`}
+      ${doneToday
+        ?`<button class="btn btn-ghost" disabled style="cursor:not-allowed;opacity:.6">✅ Completed today</button>`
+        :`<button class="btn btn-primary" onclick="startExam('${e.id}')">Start Exam →</button>`
+      }
     </div>`;
   }).join('');
 }
 
-// ─── EXAM FLOW ───────────────────────────────
+// ── EXAM FLOW ─────────────────────────────────
 function startExam(examId){
   const exam=allExams.find(e=>e.id===examId);
   if(!exam||!(exam.questions||[]).length){alert('This exam has no questions yet.');return;}
   const doneToday=allResults.some(r=>r.student_id===currentUser.id&&r.exam_id===examId&&(r.submitted_at||'').slice(0,10)===todayStr());
-  if(doneToday){alert('لقد قمت بأداء هذا الامتحان اليوم بالفعل. حاول مرة أخرى غدًا.');return;}
-  if(!confirm(`Start "${exam.title}"?\n⏱ Duration: ${exam.duration_minutes} minutes\n❓ Questions: ${exam.questions.length}`))return;
+  if(doneToday){alert('You have already taken this exam today. You can try again tomorrow.');return;}
+  if(!confirm(`Start "${exam.title}"?\n⏱ Duration: ${exam.duration_minutes} minutes\n❓ Questions: ${exam.questions.length}\n\nYou can only take this exam once today.`))return;
   activeExam=exam;answers={};audioAnswers={};questionIndex=0;lastResult=null;
   timeLeft=exam.duration_minutes*60;examStartTime=Date.now();
   document.getElementById('examName').textContent=exam.title;
-  document.getElementById('examMeta').textContent=`${exam.subject||''} • ${exam.questions.length} questions • ${exam.duration_minutes} min`;
+  document.getElementById('examMeta').textContent=`${exam.subject||''}${exam.level?' • '+exam.level:''} • ${exam.questions.length} questions • ${exam.duration_minutes} min`;
   startTimer();renderQuestion();showPage('page-exam');
 }
 
@@ -1576,13 +1637,13 @@ function renderQuestion(){
   const hasOptions=(q.options||[]).some(o=>o);
   document.getElementById('questionContainer').innerHTML=`<div class="question-card fade-in">
     <div class="question-num">Question ${questionIndex+1} of ${total}</div>
-    <div class="points-chip">${q.points||1} درجة</div>
+    <div class="points-chip">${q.points||1} point${(q.points||1)>1?'s':''}</div>
     <div class="question-text">${q.text}</div>
-    ${q.image?`<img src="${q.image}" class="q-img-preview" style="max-width:100%;max-height:260px;margin-bottom:16px"/>`:''}
+    ${q.image?`<img src="${q.image}" style="max-width:100%;max-height:260px;border-radius:8px;margin-bottom:16px;border:1px solid var(--border)"/>`:'' }
     ${q.audio_required?`
       <div class="audio-record-box" id="recBox-${questionIndex}">
-        <div style="font-size:13px;color:var(--muted);margin-bottom:10px">🎙️ سجّل إجابتك الصوتية لهذا السؤال</div>
-        <button class="btn btn-outline" id="recBtn-${questionIndex}" onclick="toggleRecording(${questionIndex})">⏺️ بدء التسجيل</button>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:10px">🎙️ Record your audio answer for this question</div>
+        <button class="btn btn-outline" id="recBtn-${questionIndex}" onclick="toggleRecording(${questionIndex})" style="width:auto">⏺️ Start Recording</button>
         <div id="recPlayback-${questionIndex}" style="margin-top:10px">${audioAnswers[questionIndex]?`<audio controls src="${audioAnswers[questionIndex]}" style="width:100%"></audio>`:''}</div>
       </div>`:''}
     ${hasOptions?`<div class="options" style="margin-top:16px">${q.options.map((opt,i)=>opt?`
@@ -1592,7 +1653,7 @@ function renderQuestion(){
   </div>`;
 }
 
-// ─── AUDIO RECORDING (student answers) ───────
+// ── AUDIO RECORDING ───────────────────────────
 async function toggleRecording(qIndex){
   const btn=document.getElementById(`recBtn-${qIndex}`);
   if(mediaRecorderCurrent&&mediaRecorderCurrent.state==='recording'){
@@ -1614,19 +1675,19 @@ async function toggleRecording(qIndex){
       reader.readAsDataURL(blob);
       mediaStreamCurrent.getTracks().forEach(t=>t.stop());
       document.getElementById(`recBox-${qIndex}`)?.classList.remove('recording');
-      if(btn)btn.textContent='⏺️ إعادة التسجيل';
+      if(btn)btn.textContent='⏺️ Re-record';
     };
     mediaRecorderCurrent.start();
     document.getElementById(`recBox-${qIndex}`)?.classList.add('recording');
-    if(btn)btn.textContent='⏹️ إيقاف التسجيل';
-  }catch(e){alert('تعذّر الوصول إلى الميكروفون. من فضلك اسمح باستخدامه من إعدادات المتصفح.');}
+    if(btn)btn.textContent='⏹️ Stop Recording';
+  }catch(e){alert('Microphone access denied. Please allow microphone in browser settings.');}
 }
 
 function selectAnswer(i){answers[questionIndex]=i;renderQuestion();}
 
 function nextQuestion(){
   if(questionIndex===activeExam.questions.length-1){
-    const ua=activeExam.questions.length-Object.keys(answers).length;
+    const ua=activeExam.questions.filter((q,i)=>!q.audio_required&&answers[i]===undefined).length;
     if(ua>0&&!confirm(`${ua} unanswered question(s). Submit anyway?`))return;
     submitExam(false);
   }else{questionIndex++;renderQuestion();}
@@ -1644,18 +1705,20 @@ async function submitExam(timeUp){
     if(answers[i]===q.correct){correct++;earnedPoints+=pts;}
   });
   const total=activeExam.questions.length;
-  const graded=pendingManual.length===0;
+  // Grading mode: auto_grade=true AND no audio = instant result
+  const forceManual=activeExam.result_mode==='manual';
+  const hasAudio=pendingManual.length>0;
+  const graded=!forceManual&&!hasAudio;
   const score=graded?(totalPoints?(earnedPoints/totalPoints)*100:0):null;
   const passed=graded?score>=(activeExam.passing_score||60):null;
   showLoading('Submitting…');
-  const res=await sb('results',{method:'POST',body:JSON.stringify({
+  await sb('results',{method:'POST',body:JSON.stringify({
     student_id:currentUser.id,exam_id:activeExam.id,score,answers,audio_answers:audioAnswers,
-    time_used_seconds:timeUsed,passed,graded,
-    pending_manual:pendingManual,earned_points:earnedPoints,total_points:totalPoints,
+    time_used_seconds:timeUsed,passed,graded,pending_manual:pendingManual,
+    earned_points:earnedPoints,total_points:totalPoints,
     submitted_at:new Date().toISOString(),attempt_date:todayStr()
   })});
-  const savedResult=res.ok?await res.json():null;
-  lastResult={score,correct,total,passed,timeUsed,graded,examTitle:activeExam.title,examSubject:activeExam.subject||''};
+  lastResult={score,correct,total,passed,timeUsed,graded,examTitle:activeExam.title};
   await loadAllData();hideLoading();
   showResultPage(score,correct,total,passed,graded);
 }
@@ -1665,14 +1728,14 @@ function showResultPage(score,correct,total,passed,graded=true){
   document.getElementById('reviewBtn').style.display=graded?'inline-flex':'none';
   if(!graded){
     document.getElementById('resultPct').textContent='⏳';
-    document.getElementById('resultGrade').textContent='قيد التصحيح';
+    document.getElementById('resultGrade').textContent='Pending';
     document.getElementById('resultGrade').style.color='#2980b9';
-    document.getElementById('resultDetail').textContent='سيتم إعلامك عند صدور النتيجة النهائية.';
+    document.getElementById('resultDetail').textContent='You will be notified when your result is ready.';
     document.getElementById('discountSection').style.display='none';
     document.getElementById('certSection').style.display='none';
     document.getElementById('reviewSection').style.display='none';
     showPage('page-result');renderLeaderboard();
-    if(currentUser.role!=='admin')renderStudentProfile();
+    if(currentUser.role==='student')renderStudentProfile();
     return;
   }
   const pct=Math.round(score);const grade=getGrade(pct);
@@ -1680,17 +1743,17 @@ function showResultPage(score,correct,total,passed,graded=true){
   document.getElementById('resultGrade').textContent=grade;
   document.getElementById('resultGrade').style.color=passed?'var(--success)':'var(--danger)';
   document.getElementById('resultDetail').textContent=`${correct} of ${total} correct  •  ${passed?'✅ Passed!':'❌ Not passed'}`;
-  // Discount
   const disc=allDiscounts.find(d=>d.student_id===currentUser.id&&!d.used);
   document.getElementById('discountSection').style.display=disc?'block':'none';
-  if(disc){document.getElementById('discountCodeDisplay').textContent=disc.code;
+  if(disc){
+    document.getElementById('discountCodeDisplay').textContent=disc.code;
     document.getElementById('discountValueDisplay').textContent=disc.value;
-    document.getElementById('discountMsgDisplay').textContent=disc.message||'';}
-  // Certificate
+    document.getElementById('discountMsgDisplay').textContent=disc.message||'';
+  }
   document.getElementById('certSection').style.display=passed?'block':'none';
   document.getElementById('reviewSection').style.display='none';
   showPage('page-result');renderLeaderboard();
-  if(currentUser.role!=='admin')renderStudentProfile();
+  if(currentUser.role==='student')renderStudentProfile();
 }
 
 function startReview(){
@@ -1699,9 +1762,9 @@ function startReview(){
   sec.innerHTML=activeExam.questions.map((q,i)=>{
     const ua=answers[i];const ca=q.correct;
     return `<div class="question-card" style="margin-bottom:16px">
-      <div class="question-num">Question ${i+1}</div>
+      <div class="question-num">Question ${i+1} — ${q.points||1} pt${(q.points||1)>1?'s':''}</div>
       <div class="question-text">${q.text}</div>
-      <div class="options">${q.options.map((opt,oi)=>opt?`
+      <div class="options">${(q.options||[]).map((opt,oi)=>opt?`
         <div class="option ${oi===ca?'correct':oi===ua&&ua!==ca?'wrong':''}">
           <div class="option-letter">${letters[oi]}</div><span>${opt}</span>
           ${oi===ca?'<span style="color:var(--success);font-size:12px;margin-left:auto">✓ Correct</span>':''}
@@ -1712,48 +1775,33 @@ function startReview(){
   sec.scrollIntoView({behavior:'smooth'});
 }
 
-// ─── CERTIFICATE (client-side jsPDF) ─────────
+// ── CERTIFICATE ───────────────────────────────
 function downloadCertificate(){
   if(!lastResult||!activeExam)return;
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   const W=297,H=210;
-  // Background
   doc.setFillColor(10,10,10);doc.rect(0,0,W,H,'F');
-  // Border outer
   doc.setDrawColor(14,165,233);doc.setLineWidth(1.5);doc.rect(8,8,W-16,H-16);
-  // Border inner
   doc.setDrawColor(21,101,192);doc.setLineWidth(0.5);doc.rect(12,12,W-24,H-24);
-  // Top line
-  doc.setDrawColor(14,165,233);doc.setLineWidth(0.8);doc.line(22,40,W-22,40);
-  // Institute name
   doc.setTextColor(14,165,233);doc.setFontSize(22);doc.setFont('helvetica','bold');
   doc.text('MY INSTITUTE',W/2,30,{align:'center'});
   doc.setFontSize(9);doc.setFont('helvetica','normal');doc.setTextColor(21,101,192);
   doc.text('Quran  •  Arabic Language  •  Islamic Studies',W/2,37,{align:'center'});
-  // Bottom line
-  doc.setDrawColor(21,101,192);doc.line(22,42,W-22,42);
-  // Certificate title
+  doc.setDrawColor(14,165,233);doc.setLineWidth(0.8);doc.line(22,40,W-22,40);
   doc.setTextColor(220,220,220);doc.setFontSize(11);
   doc.text('CERTIFICATE OF ACHIEVEMENT',W/2,55,{align:'center'});
-  // Stars
   doc.setTextColor(14,165,233);doc.setFontSize(14);doc.text('✦  ✦  ✦',W/2,66,{align:'center'});
-  // "This is to certify that"
   doc.setTextColor(180,180,180);doc.setFontSize(10);doc.setFont('helvetica','normal');
   doc.text('This is to certify that',W/2,80,{align:'center'});
-  // Student name
   doc.setTextColor(14,165,233);doc.setFontSize(28);doc.setFont('helvetica','bold');
   doc.text(currentUser.name,W/2,98,{align:'center'});
-  // Underline
   const nw=doc.getTextWidth(currentUser.name);
   doc.setDrawColor(21,101,192);doc.setLineWidth(0.5);doc.line(W/2-nw/2,100,W/2+nw/2,100);
-  // "has successfully completed"
   doc.setTextColor(180,180,180);doc.setFontSize(10);doc.setFont('helvetica','normal');
   doc.text('has successfully completed the examination:',W/2,112,{align:'center'});
-  // Exam title
   doc.setTextColor(235,235,235);doc.setFontSize(16);doc.setFont('helvetica','bold');
   doc.text(activeExam.title,W/2,124,{align:'center'});
-  // Score box
   const bx=W/2-30,bw=52,bh=22;
   doc.setFillColor(26,20,0);doc.setDrawColor(14,165,233);doc.setLineWidth(0.8);
   doc.roundedRect(bx,132,bw,bh,3,3,'FD');
@@ -1761,31 +1809,34 @@ function downloadCertificate(){
   doc.text(`${Math.round(lastResult.score)}%`,W/2,145,{align:'center'});
   doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(21,101,192);
   doc.text('SCORE',W/2,152,{align:'center'});
-  // Date
   const dt=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
   doc.setTextColor(150,150,150);doc.setFontSize(9);
   doc.text(`Date of Completion: ${dt}`,W/2,164,{align:'center'});
-  // Signature line
   doc.setDrawColor(21,101,192);doc.setLineWidth(0.5);doc.line(W/2-35,178,W/2+35,178);
   doc.setTextColor(14,165,233);doc.setFontSize(10);doc.setFont('helvetica','bold');
   doc.text('Sheikh Muhammad Yusuf',W/2,183,{align:'center'});
   doc.setTextColor(130,130,130);doc.setFontSize(8);doc.setFont('helvetica','normal');
   doc.text('Director – MY Institute',W/2,188,{align:'center'});
-  // Corner ornaments
   [[20,20],[W-20,20],[20,H-20],[W-20,H-20]].forEach(([x,y])=>{
     doc.setTextColor(14,165,233);doc.setFontSize(12);doc.text('✦',x,y,{align:'center'});
   });
   doc.save(`Certificate_${currentUser.name.replace(/\s+/g,'_')}_${activeExam.title.replace(/\s+/g,'_')}.pdf`);
 }
 
-// ─── ADMIN PDF REPORTS ───────────────────────
+function downloadCertForResult(resultId){
+  const r=allResults.find(r=>r.id===resultId);if(!r)return;
+  const ex=allExams.find(e=>e.id===r.exam_id);if(!ex)return;
+  activeExam=ex;lastResult={score:r.score,passed:r.passed};
+  downloadCertificate();
+}
+
+// ── ADMIN REPORTS ─────────────────────────────
 function downloadAdminReport(filterStudentId=null,filterExamId=null,filename='MY_Institute_Report'){
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
   const W=210,margin=15;let y=margin;
   const addPage=()=>{doc.addPage();y=margin;};
   const checkPage=(needed=20)=>{if(y+needed>285)addPage();};
-  // Header
   doc.setFillColor(10,10,10);doc.rect(0,0,W,40,'F');
   doc.setTextColor(14,165,233);doc.setFontSize(18);doc.setFont('helvetica','bold');
   doc.text('MY INSTITUTE',W/2,16,{align:'center'});
@@ -1796,20 +1847,16 @@ function downloadAdminReport(filterStudentId=null,filterExamId=null,filename='MY
   doc.setFontSize(8);doc.setFont('helvetica','normal');doc.setTextColor(150,150,150);
   doc.text(`Generated: ${new Date().toLocaleString()}`,W/2,37,{align:'center'});
   y=50;
-  // Filter results
   let results=allResults;
   if(filterStudentId)results=results.filter(r=>r.student_id===filterStudentId);
   if(filterExamId)results=results.filter(r=>r.exam_id===filterExamId);
   let students=filterStudentId?allStudents.filter(s=>s.id===filterStudentId):allStudents;
   let exams=filterExamId?allExams.filter(e=>e.id===filterExamId):allExams;
-  // Overview stats
-  const stats=[
-    ['Total Students',students.length],['Total Exams',exams.length],
-    ['Total Attempts',results.length],
-    ['Pass Rate',results.length?Math.round(results.filter(r=>r.passed).length/results.length*100)+'%':'N/A'],
-    ['Average Score',results.length?Math.round(results.reduce((a,r)=>a+r.score,0)/results.length)+'%':'N/A'],
-    ['Discounts Sent',allDiscounts.length]
-  ];
+  const gradedR=results.filter(r=>r.graded!==false);
+  const stats=[['Total Students',students.length],['Total Exams',exams.length],['Total Attempts',results.length],
+    ['Pass Rate',gradedR.length?Math.round(gradedR.filter(r=>r.passed).length/gradedR.length*100)+'%':'N/A'],
+    ['Average Score',gradedR.length?Math.round(gradedR.reduce((a,r)=>a+r.score,0)/gradedR.length)+'%':'N/A'],
+    ['Bank Questions',allQuestionBank.length]];
   doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(21,101,192);
   doc.text('Overview',margin,y);y+=6;
   stats.forEach(([label,val],i)=>{
@@ -1821,13 +1868,12 @@ function downloadAdminReport(filterStudentId=null,filterExamId=null,filename='MY
     doc.text(String(val),W-margin-3,y+1,{align:'right'});y+=8;
   });
   y+=6;
-  // Leaderboard
-  if(results.length){
+  if(gradedR.length){
     checkPage(30);
     doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(21,101,192);
     doc.text('Top Students',margin,y);y+=6;
     const scoreMap={};
-    results.forEach(r=>{if(!scoreMap[r.student_id]||r.score>scoreMap[r.student_id].score)scoreMap[r.student_id]=r;});
+    gradedR.forEach(r=>{if(!scoreMap[r.student_id]||r.score>scoreMap[r.student_id].score)scoreMap[r.student_id]=r;});
     const top=Object.values(scoreMap).sort((a,b)=>b.score-a.score).slice(0,5);
     const medals=['1st','2nd','3rd','4th','5th'];
     top.forEach((r,i)=>{
@@ -1843,58 +1889,17 @@ function downloadAdminReport(filterStudentId=null,filterExamId=null,filename='MY
       y+=8;
     });y+=6;
   }
-  // Results table
-  if(results.length){
-    checkPage(30);
-    doc.setFontSize(12);doc.setFont('helvetica','bold');doc.setTextColor(21,101,192);
-    doc.text('All Results',margin,y);y+=6;
-    // Header row
-    const cols=[['Student',55],['Exam',60],['Score',20],['Grade',18],['Status',22],['Date',25]];
-    let x=margin;
-    doc.setFillColor(21,101,192);doc.rect(margin,y-4,W-margin*2,8,'F');
-    cols.forEach(([h,w])=>{doc.setTextColor(10,10,10);doc.setFontSize(8);doc.setFont('helvetica','bold');doc.text(h,x+2,y+1);x+=w;});
-    y+=8;
-    const sortedR=[...results].sort((a,b)=>b.score-a.score);
-    sortedR.forEach((r,i)=>{
-      checkPage(8);
-      const s=allStudents.find(s=>s.id===r.student_id)||{name:'?'};
-      const ex=allExams.find(e=>e.id===r.exam_id)||{title:'?'};
-      const pct=Math.round(r.score);
-      const g=pct>=95?'A+':pct>=85?'A':pct>=75?'B':pct>=65?'C':pct>=50?'D':'F';
-      let dt=r.submitted_at||'';try{dt=new Date(dt).toLocaleDateString();}catch{}
-      doc.setFillColor(i%2===0?26:22,i%2===0?26:22,i%2===0?26:22);doc.rect(margin,y-4,W-margin*2,8,'F');
-      const vals=[s.name.slice(0,20),ex.title.slice(0,22),pct+'%',g,r.passed?'Pass':'Fail',dt];
-      x=margin;
-      vals.forEach((v,vi)=>{
-        doc.setTextColor(vi===2?(pct>=60?39:192):vi===4?(r.passed?39:192):190,vi===2?(pct>=60?174:57):vi===4?(r.passed?174:57):190,vi===2?(pct>=60?96:43):vi===4?(r.passed?96:43):190);
-        doc.setFontSize(8);doc.setFont('helvetica','normal');
-        doc.text(String(v),x+2,y+1);x+=cols[vi][1];
-      });y+=8;
-    });
-  }
   doc.save(`${filename}.pdf`);
 }
-
-function downloadStudentReport(){
-  const id=document.getElementById('reportStudentSelect').value;
-  const s=id?allStudents.find(s=>s.id===id):null;
-  downloadAdminReport(id||null,null,`MY_Institute_Report_${s?s.name.replace(/\s+/g,'_'):'AllStudents'}`);
-}
-function downloadExamReport(){
-  const id=document.getElementById('reportExamSelect').value;
-  const ex=id?allExams.find(e=>e.id===id):null;
-  downloadAdminReport(null,id||null,`MY_Institute_Report_${ex?ex.title.replace(/\s+/g,'_'):'AllExams'}`);
-}
+function downloadStudentReport(){const id=document.getElementById('reportStudentSelect').value;const s=id?allStudents.find(s=>s.id===id):null;downloadAdminReport(id||null,null,`MY_Report_${s?s.name.replace(/\s+/g,'_'):'AllStudents'}`);}
+function downloadExamReport(){const id=document.getElementById('reportExamSelect').value;const ex=id?allExams.find(e=>e.id===id):null;downloadAdminReport(null,id||null,`MY_Report_${ex?ex.title.replace(/\s+/g,'_'):'AllExams'}`);}
 
 function openWAResultsBlast(){
   const area=document.getElementById('waResultsArea');
   area.style.display=area.style.display==='none'?'block':'none';
   if(area.style.display==='block'){
-    populateDropdowns();
-    const esel=document.getElementById('waResultExam');
-    const ssel=document.getElementById('waResultStudent');
-    esel.innerHTML='<option value="">Choose exam…</option>'+allExams.map(e=>`<option value="${e.id}">${e.title}</option>`).join('');
-    ssel.innerHTML='<option value="">All who attempted</option>'+allStudents.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+    document.getElementById('waResultExam').innerHTML='<option value="">Choose exam…</option>'+allExams.map(e=>`<option value="${e.id}">${e.title}</option>`).join('');
+    document.getElementById('waResultStudent').innerHTML='<option value="">All who attempted</option>'+allStudents.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
   }
 }
 
@@ -1903,17 +1908,12 @@ function previewResultWA(){
   const sid=document.getElementById('waResultStudent').value;
   if(!eid){document.getElementById('waResultPreview').textContent='Select exam to preview…';return;}
   const ex=allExams.find(e=>e.id===eid)||{title:'Exam'};
-  const results=allResults.filter(r=>r.exam_id===eid&&(sid?r.student_id===sid:true));
-  if(!results.length){document.getElementById('waResultPreview').textContent='No results for this selection.';return;}
+  const results=allResults.filter(r=>r.exam_id===eid&&r.graded!==false&&(sid?r.student_id===sid:true));
+  if(!results.length){document.getElementById('waResultPreview').textContent='No graded results for this selection.';return;}
   const r=results[0];const s=allStudents.find(s=>s.id===r.student_id)||{name:'Student'};
-  const pct=Math.round(r.score);const grade=getGrade(pct).split(' ')[1]||'';
+  const pct=Math.round(r.score);
   document.getElementById('waResultPreview').textContent=
-    `📊 *MY Institute – Exam Result*\n\nAssalamu Alaikum ${s.name},\n\n` +
-    `Here is your result for:\n📝 *${ex.title}*\n\n` +
-    `🏆 Score: *${pct}%*\n⭐ Grade: *${grade}*\n` +
-    `${r.passed?'✅ Result: *PASSED*':'❌ Result: Not passed this time'}\n\n` +
-    `${r.passed?'Congratulations! Keep up the excellent work.':'Don\'t give up! Review the material and try again.'}\n\n` +
-    `Jazakum Allah Khayran 🌙\n*MY Institute*`;
+    `📊 *MY Institute – Exam Result*\n\nAssalamu Alaikum ${s.name},\n\nHere is your result for:\n📝 *${ex.title}*\n\n🏆 Score: *${pct}%*\n⭐ Grade: *${getGrade(pct)}*\n${r.passed?'✅ Result: *PASSED*':'❌ Result: Not passed this time'}\n\n${r.passed?'Congratulations! Keep up the excellent work.':"Don't give up! Review the material and try again."}\n\nJazakum Allah Khayran 🌙\n*MY Institute*`;
 }
 
 function sendResultWA(){
@@ -1925,7 +1925,7 @@ function sendResultWA(){
   window.open(`https://wa.me/${num}?text=${encodeURIComponent(msg)}`,'_blank');
 }
 
-// ─── NOTIFICATIONS ───────────────────────────
+// ── NOTIFICATIONS ─────────────────────────────
 function renderNotifBanner(){
   const area=document.getElementById('notifBannerArea');if(!area)return;
   const mine=allNotifications.filter(n=>n.student_id===currentUser.id&&!n.read);
@@ -1933,7 +1933,7 @@ function renderNotifBanner(){
   area.innerHTML=mine.map(n=>`
     <div class="notif-banner">
       <div>🔔 ${n.message}</div>
-      <button class="btn-sm" onclick="markNotificationRead('${n.id}')">تم الاطلاع ✔</button>
+      <button class="btn-sm" onclick="markNotificationRead('${n.id}')">Mark read ✔</button>
     </div>`).join('');
 }
 async function markNotificationRead(id){
@@ -1942,90 +1942,79 @@ async function markNotificationRead(id){
   renderNotifBanner();renderStudentProfile();
 }
 
-// ─── STUDENT PROFILE ─────────────────────────
+// ── STUDENT PROFILE ───────────────────────────
 function renderStudentProfile(){
   if(!currentUser)return;
-  // Scores
   const myR=allResults.filter(r=>r.student_id===currentUser.id).sort((a,b)=>new Date(b.submitted_at)-new Date(a.submitted_at));
-  const scoresEl=document.getElementById('myScores');
-  scoresEl.innerHTML=myR.length?myR.map(r=>{
+  document.getElementById('myScores').innerHTML=myR.length?myR.map(r=>{
     const ex=allExams.find(e=>e.id===r.exam_id)||{title:'?'};
     const pending=r.graded===false;
     const pct=pending?null:Math.round(r.score);
     return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
       <div><div style="font-size:13px;font-weight:500">${ex.title}</div><div style="font-size:11px;color:var(--muted)">${r.submitted_at?new Date(r.submitted_at).toLocaleDateString():''}</div></div>
-      ${pending?'<span class="badge badge-pending">⏳ قيد التصحيح</span>':`<span style="font-family:'Cinzel',serif;font-size:16px;color:${pct>=60?'var(--success)':'var(--danger)'}">${pct}%</span>`}
+      ${pending?'<span class="badge badge-pending">⏳ Pending</span>':`<span style="font-family:'Cinzel',serif;font-size:16px;color:${pct>=60?'var(--success)':'var(--danger)'}">${pct}%</span>`}
     </div>`;
   }).join(''):'<div class="empty-state" style="padding:20px"><div class="icon" style="font-size:28px">📝</div><p>No exams taken yet</p></div>';
-  // Discounts
   const myD=allDiscounts.filter(d=>d.student_id===currentUser.id);
-  const discsEl=document.getElementById('myDiscounts');
-  discsEl.innerHTML=myD.length?myD.map(d=>`
+  document.getElementById('myDiscounts').innerHTML=myD.length?myD.map(d=>`
     <div style="padding:10px;border:1px solid var(--gold);border-radius:8px;margin-bottom:8px;background:rgba(21,101,192,.08)">
       <div style="font-family:'Cinzel',serif;font-size:18px;color:var(--gold-light);letter-spacing:3px">${d.code}</div>
       <div style="font-size:12px;color:var(--gold-pale);margin-top:2px">${d.value}</div>
       <div style="font-size:11px;color:var(--muted);margin-top:4px">${d.message||''}</div>
       <div style="margin-top:6px">${d.used?'<span class="badge badge-active">Used</span>':'<span class="badge badge-discount">Active 🎁</span>'}</div>
     </div>`).join(''):'<div class="empty-state" style="padding:20px"><div class="icon" style="font-size:28px">🎁</div><p>No gifts yet</p></div>';
-  // Certificates (passed exams)
   const passed=myR.filter(r=>r.passed);
-  const certsEl=document.getElementById('myCerts');
-  certsEl.innerHTML=passed.length?passed.map(r=>{
-    const ex=allExams.find(e=>e.id===r.exam_id)||{title:'?',subject:'',questions:[]};
-    const pct=Math.round(r.score);
+  document.getElementById('myCerts').innerHTML=passed.length?passed.map(r=>{
+    const ex=allExams.find(e=>e.id===r.exam_id)||{title:'?'};
     return `<div style="display:inline-flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(21,101,192,.1);border:1px solid var(--gold);border-radius:10px;margin:0 8px 8px 0">
       <div>📜</div>
       <div><div style="font-size:13px;font-weight:600;color:var(--gold-light)">${ex.title}</div>
-      <div style="font-size:11px;color:var(--muted)">${pct}% • ${r.submitted_at?new Date(r.submitted_at).toLocaleDateString():''}</div></div>
+      <div style="font-size:11px;color:var(--muted)">${Math.round(r.score)}% • ${r.submitted_at?new Date(r.submitted_at).toLocaleDateString():''}</div></div>
       <button class="btn btn-outline" style="padding:6px 12px;font-size:12px" onclick="downloadCertForResult('${r.id}')">📥</button>
     </div>`;
   }).join(''):'<div style="color:var(--muted);font-size:13px;padding:12px">Pass an exam to earn a certificate!</div>';
 }
 
-function downloadCertForResult(resultId){
-  const r=allResults.find(r=>r.id===resultId);
-  if(!r)return;
-  const ex=allExams.find(e=>e.id===r.exam_id);
-  if(!ex)return;
-  activeExam=ex;lastResult={score:r.score,passed:r.passed};
-  downloadCertificate();
-}
-
-// ─── HELPERS ────────────────────────────────
+// ── HELPERS ───────────────────────────────────
 function getGrade(pct){
-  if(pct>=95)return '🌟 (A+)';if(pct>=85)return '⭐ (A)';if(pct>=75)return '👍 (B)';
-  if(pct>=65)return '✅ (C)';if(pct>=50)return '⚠️ (D)';return '❌ (F)';
+  if(pct>=95)return '🌟 A+';if(pct>=85)return '⭐ A';if(pct>=75)return '👍 B';
+  if(pct>=65)return '✅ C';if(pct>=50)return '⚠️ D';return '❌ F';
 }
 
 function populateDropdowns(){
+  // Discount student select
   const discSel=document.getElementById('discountStudent');
-  discSel.innerHTML='<option value="">Choose student…</option>'+allStudents.map(s=>`<option value="${s.id}">${s.name} (@${s.username})</option>`).join('');
+  if(discSel)discSel.innerHTML='<option value="">Choose student…</option>'+allStudents.map(s=>`<option value="${s.id}">${s.name} (@${s.username})</option>`).join('');
+  // Filter dropdowns
   const ef=document.getElementById('filterExam'),sf=document.getElementById('filterStudent');
-  ef.innerHTML='<option value="">All Exams</option>'+allExams.map(e=>`<option value="${e.id}">${e.title}</option>`).join('');
-  sf.innerHTML='<option value="">All Students</option>'+allStudents.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  if(ef)ef.innerHTML='<option value="">All Exams</option>'+allExams.map(e=>`<option value="${e.id}">${e.title}</option>`).join('');
+  if(sf)sf.innerHTML='<option value="">All Students</option>'+allStudents.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  // Schedule exam select
   const schedEx=document.getElementById('schedExam');
-  schedEx.innerHTML='<option value="">Choose exam…</option>'+allExams.map(e=>`<option value="${e.id}">${e.title}</option>`).join('');
+  if(schedEx)schedEx.innerHTML='<option value="">Choose exam…</option>'+allExams.map(e=>`<option value="${e.id}">${e.title}</option>`).join('');
+  // WA blast exam select (from schedules)
   const waBlast=document.getElementById('waBlastExam');
-  waBlast.innerHTML='<option value="">Choose exam…</option>'+allSchedules.map(s=>{
+  if(waBlast)waBlast.innerHTML='<option value="">Choose exam…</option>'+allSchedules.map(s=>{
     const ex=allExams.find(e=>e.id===s.exam_id)||{title:'?'};
     return `<option value="${s.exam_id}">${ex.title} (${new Date(s.opens_at).toLocaleDateString()})`;
   }).join('');
   const waBstu=document.getElementById('waBlastStudent');
-  waBstu.innerHTML='<option value="all">All Students</option>'+allStudents.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  if(waBstu)waBstu.innerHTML='<option value="all">All Students</option>'+allStudents.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  // Reports
   const repStu=document.getElementById('reportStudentSelect');
-  repStu.innerHTML='<option value="">All Students</option>'+allStudents.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  if(repStu)repStu.innerHTML='<option value="">All Students</option>'+allStudents.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
   const repEx=document.getElementById('reportExamSelect');
-  repEx.innerHTML='<option value="">All Exams</option>'+allExams.map(e=>`<option value="${e.id}">${e.title}</option>`).join('');
-  // Subject/level filter dropdowns for bank
+  if(repEx)repEx.innerHTML='<option value="">All Exams</option>'+allExams.map(e=>`<option value="${e.id}">${e.title}</option>`).join('');
+  // Bank filter dropdowns
   const subjects=[...new Set(allQuestionBank.map(q=>q.subject).filter(Boolean))];
   const levels=[...new Set(allQuestionBank.map(q=>q.level).filter(Boolean))];
-  const subjOptHtml=(v='')=>'<option value="">كل المواد</option>'+subjects.map(s=>`<option value="${s}" ${s===v?'selected':''}>${s}</option>`).join('');
-  const lvlOptHtml=(v='')=>'<option value="">كل المستويات</option>'+levels.map(l=>`<option value="${l}" ${l===v?'selected':''}>${l}</option>`).join('');
-  ['bankFilterSubject','pickBankSubject'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=subjOptHtml(el.value);});
-  ['bankFilterLevel','pickBankLevel'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=lvlOptHtml(el.value);});
+  const subjHtml='<option value="">All Subjects</option>'+subjects.map(s=>`<option value="${s}">${s}</option>`).join('');
+  const lvlHtml='<option value="">All Levels</option>'+levels.map(l=>`<option value="${l}">${l}</option>`).join('');
+  ['bankFilterSubject','pickBankSubject','tBankFilterSubject'].forEach(id=>{const el=document.getElementById(id);if(el){const v=el.value;el.innerHTML=subjHtml;el.value=v;}});
+  ['bankFilterLevel','pickBankLevel','tBankFilterLevel'].forEach(id=>{const el=document.getElementById(id);if(el){const v=el.value;el.innerHTML=lvlHtml;el.value=v;}});
   // Student assignment picker
   const spList=document.getElementById('examStudentPickList');
-  if(spList)spList.innerHTML=allStudents.map(s=>`<div class="student-pick-item"><input type="checkbox" value="${s.id}" class="examStudentChk"/> ${s.name}</div>`).join('')||'<div class="text-muted" style="font-size:12px">لا يوجد طلاب بعد</div>';
+  if(spList)spList.innerHTML=allStudents.map(s=>`<div class="student-pick-item"><input type="checkbox" value="${s.id}" class="examStudentChk"/> ${s.name}</div>`).join('')||'<div class="text-muted" style="font-size:12px">No students yet</div>';
 }
 
 function toggleAssignAll(){
@@ -2033,12 +2022,14 @@ function toggleAssignAll(){
   document.getElementById('examStudentPickList').style.display=all?'none':'grid';
 }
 
-// ─── ADMIN TABS ──────────────────────────────
+// ── TABS ──────────────────────────────────────
 function showAdminTab(tab){showPage('page-admin');switchAdminTab(tab);}
 function switchAdminTab(tab){
   const tabs=['students','bank','exams','schedule','results','discounts','reports'];
-  tabs.forEach(t=>document.getElementById(`adminTab-${t}`).style.display=t===tab?'block':'none');
-  tabs.forEach(t=>{const b=document.getElementById(`tabBtn-${t}`);if(b)b.classList.toggle('active',t===tab);});
+  tabs.forEach(t=>{
+    const el=document.getElementById(`adminTab-${t}`);if(el)el.style.display=t===tab?'block':'none';
+    const b=document.getElementById(`tabBtn-${t}`);if(b)b.classList.toggle('active',t===tab);
+  });
   if(tab==='students')renderStudentsTable();
   if(tab==='bank'){populateDropdowns();renderBankList();}
   if(tab==='exams'){populateDropdowns();renderAdminExams();}
@@ -2048,20 +2039,24 @@ function switchAdminTab(tab){
   if(tab==='reports')populateDropdowns();
 }
 
-// ─── NAVIGATION & MODALS ─────────────────────
+function showTeacherTab(tab){showPage('page-teacher');switchTeacherTab(tab);}
+function switchTeacherTab(tab){
+  const tabs=['bank','exams','results'];
+  tabs.forEach(t=>{
+    const el=document.getElementById(`teacherTab-${t}`);if(el)el.style.display=t===tab?'block':'none';
+    const b=document.getElementById(`teacherTabBtn-${t}`);if(b)b.classList.toggle('active',t===tab);
+  });
+  if(tab==='bank'){populateDropdowns();renderTeacherBankList();}
+  if(tab==='exams'){populateDropdowns();renderTeacherExamList();}
+  if(tab==='results')renderTeacherResultsTable();
+}
+
+// ── NAVIGATION & MODALS ───────────────────────
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');window.scrollTo(0,0);
 }
-function openModal(id){
-  if(id==='modalCreateExam'){
-    questionCount=0;document.getElementById('questionsBuilder').innerHTML='';document.getElementById('createExamAlert').innerHTML='';
-    populateDropdowns();renderBankPicker();
-    document.getElementById('examAssignAll').checked=true;toggleAssignAll();
-    addQuestion();
-  }
-  document.getElementById(id).classList.add('open');
-}
+function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.getElementById('page-login').classList.contains('active'))login();});
