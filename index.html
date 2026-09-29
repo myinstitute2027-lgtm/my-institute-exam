@@ -206,7 +206,12 @@
     .tip-icon{font-size:22px;flex-shrink:0}
     .tip-title{font-weight:600;font-size:13px;margin-bottom:4px}
     .tip-desc{font-size:12px;color:var(--muted)}
-  </style>
+  #rvBody.only-wrong .rv-ok{display:none}.qtype-note{font-size:12px;color:var(--muted);margin-bottom:6px}.insp-card{background:linear-gradient(135deg,#F0FDF4 0%,#EFF8FF 100%);border:2px solid var(--border);border-radius:18px;padding:22px 26px;margin-bottom:24px;box-shadow:0 4px 20px rgba(21,101,192,.08)}
+.insp-tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold);background:#fff;border:1px solid var(--border);border-radius:20px;padding:3px 12px;margin-bottom:10px}
+.insp-hi{font-size:15px;font-weight:600;color:var(--gold-pale);margin-bottom:8px}
+.insp-text{font-family:'Amiri',serif;font-size:21px;line-height:1.6;color:var(--text)}
+.insp-src{margin-top:8px;font-size:13px;color:var(--muted)}
+</style>
 </head>
 <body>
 
@@ -277,6 +282,7 @@
         </div>
       </div>
     </div>
+    <div id="dailyInspiration" class="insp-card"></div>
     <div id="notifBannerArea"></div>
     <div id="adminStats" style="display:none">
       <div class="stats-row">
@@ -739,6 +745,14 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="modalReview">
+  <div class="modal" style="max-width:720px">
+    <div class="modal-title"><span id="rvTitle">Review</span> <button class="close-btn" onclick="closeModal('modalReview')">✕</button></div>
+    <div id="rvSummary" style="margin-bottom:12px;font-size:13px"></div>
+    <label style="display:inline-flex;align-items:center;gap:6px;font-size:13px;margin-bottom:14px;cursor:pointer"><input type="checkbox" style="width:auto" onchange="document.getElementById('rvBody').classList.toggle('only-wrong',this.checked)"/> Show only mistakes / manual</label>
+    <div id="rvBody"></div>
+  </div>
+</div>
 <!-- Manual Grading -->
 <div class="modal-overlay" id="modalGradeManual">
   <div class="modal" style="max-width:640px">
@@ -819,6 +833,42 @@ async function login(){
   }
 }
 
+const INSPIRATION=[
+ {t:'Quran',x:'Indeed, with hardship comes ease.',s:'Surah Ash-Sharh 94:6'},
+ {t:'Quran',x:'And say: My Lord, increase me in knowledge.',s:'Surah Taha 20:114'},
+ {t:'Quran',x:'Allah will raise, by degrees, those among you who believe and those who have been given knowledge.',s:'Surah Al-Mujadila 58:11'},
+ {t:'Quran',x:'Allah does not burden a soul beyond what it can bear.',s:'Surah Al-Baqarah 2:286'},
+ {t:'Quran',x:'Indeed, Allah does not change the condition of a people until they change what is within themselves.',s:'Surah Ar-Ra\u2019d 13:11'},
+ {t:'Quran',x:'Say: Are those who know equal to those who do not know?',s:'Surah Az-Zumar 39:9'},
+ {t:'Quran',x:'Read in the name of your Lord who created.',s:'Surah Al-\u2018Alaq 96:1'},
+ {t:'Quran',x:'And whoever is mindful of Allah, He will make a way out for him.',s:'Surah At-Talaq 65:2'},
+ {t:'Hadith',x:'Whoever follows a path in search of knowledge, Allah will make easy for him a path to Paradise.',s:'Sahih Muslim'},
+ {t:'Hadith',x:'The best among you are those who learn the Quran and teach it.',s:'Sahih al-Bukhari'},
+ {t:'Hadith',x:'Actions are judged by intentions, and everyone will get what they intended.',s:'Bukhari & Muslim'},
+ {t:'Hadith',x:'The most beloved deeds to Allah are those done consistently, even if they are small.',s:'Bukhari & Muslim'},
+ {t:'Hadith',x:'The strong believer is better and more beloved to Allah than the weak believer, and there is good in both.',s:'Sahih Muslim'},
+ {t:'Hadith',x:'Seeking knowledge is an obligation upon every Muslim.',s:'Sunan Ibn Majah'},
+ {t:'Encouragement',x:'Every expert was once a beginner. Keep showing up.',s:''},
+ {t:'Encouragement',x:'Small steps every day lead to big results.',s:''},
+ {t:'Encouragement',x:'A mistake is proof that you are trying \u2014 learn from it and go again.',s:''},
+ {t:'Encouragement',x:'Your effort today is the success you will celebrate tomorrow.',s:''}
+];
+const INSP_ICON={Quran:'\ud83d\udcd6 Ayah',Hadith:'\ud83d\udd4c Hadith',Encouragement:'\ud83d\udca1 Words of encouragement'};
+let inspOffset=0;
+function renderInspiration(shuffle){
+  const el=document.getElementById('dailyInspiration');if(!el||!currentUser)return;
+  if(shuffle)inspOffset++;
+  const day=Math.floor(Date.now()/864e5);
+  let h=0;for(const c of String(currentUser.id))h=(h*31+c.charCodeAt(0))>>>0;
+  const q=INSPIRATION[(day+h+inspOffset)%INSPIRATION.length];
+  const first=String(currentUser.name||'').trim().split(/\s+/)[0]||'Friend';
+  const hi=['Keep going','You can do it','Stay focused','Believe in yourself','Well done for being here'][(day+h+inspOffset)%5];
+  el.innerHTML=`<span class="insp-tag">${INSP_ICON[q.t]}</span>
+    <div class="insp-hi">${hi}, ${esc(first)}! \ud83c\udf1f</div>
+    <div class="insp-text">\u201c${esc(q.x)}\u201d</div>
+    ${q.s?`<div class="insp-src">\u2014 ${esc(q.s)}</div>`:''}
+    <button class="btn-sm" style="margin-top:12px" onclick="renderInspiration(true)">\ud83d\udd04 Another one</button>`;
+}
 async function afterLogin(){
   showLoading('Loading data…');
   document.getElementById('mainHeader').style.display='block';
@@ -851,6 +901,7 @@ async function afterLogin(){
   }
   renderLeaderboard();updateAdminStats();showPage('page-home');
   document.getElementById('homeWelcome').textContent=`Welcome, ${currentUser.name}!`;
+  renderInspiration();
   document.getElementById('homeSubtitle').textContent=currentUser.role==='admin'
     ?'Admin Dashboard — Manage students, exams, schedules, and results.'
     :currentUser.role==='teacher'
@@ -906,8 +957,18 @@ function renderLeaderboard(){
       <div class="lb-name">${s.name}${allDiscounts.find(d=>d.student_id===s.id)?'<span class="gift-tag">🎁</span>':''}</div>
       <div style="font-size:11px;color:var(--muted)">${ex?ex.title:''}</div>
       <div class="lb-score">${Math.round(r.score)}%</div>
+      ${currentUser&&currentUser.role==='admin'?`<button class="btn-sm" title="Remove from leaderboard" style="color:var(--danger);border-color:var(--danger)" onclick="removeFromLeaderboard('${r.student_id}')">🗑</button>`:''}
     </div>`;
   }).join('');
+}
+async function removeFromLeaderboard(studentId){
+  const s=allStudents.find(x=>x.id===studentId)||{name:'this student'};
+  if(!confirm(`Remove ${s.name} from the leaderboard?\n\nThis deletes ALL of their exam results (scores). Their account stays.\nTo delete the account itself, use the Students tab.`))return;
+  showLoading('Removing…');
+  await sb(`results?student_id=eq.${studentId}`,{method:'DELETE',prefer:''});
+  await loadAllData();renderLeaderboard();updateAdminStats();
+  if(typeof renderResultsTable==='function')renderResultsTable();
+  hideLoading();
 }
 
 function updateAdminStats(){
@@ -1152,70 +1213,96 @@ function addSelectedBankQuestions(){
 }
 
 // ── EXAMS ────────────────────────────────────
-function openCreateExamModal(){
-  questionCount=0;
+const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const normA=s=>String(s??'').toLowerCase().replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/\s+/g,' ').trim();
+const qType=q=>q.type||'mcq';
+let editingExamId=null;
+function gradeQ(q,a){
+  const max=q.points||1,t=qType(q);
+  if(q.audio_required||t==='short')return{max,earned:0,status:'manual'};
+  if(t==='fill'){const ok=(q.answers||[]).some(x=>normA(x)===normA(a));return{max,earned:ok?max:0,status:ok?'correct':'wrong'};}
+  if(t==='match'){const P=q.pairs||[];const n=P.filter((x,k)=>a&&normA(a[k])===normA(x.r)).length;
+    return{max,earned:P.length?max*n/P.length:0,status:n===P.length?'correct':n?'partial':'wrong'};}
+  const ok=a===q.correct;return{max,earned:ok?max:0,status:ok?'correct':'wrong'};
+}
+const INP='width:100%;background:#fff;border:2px solid var(--border);border-radius:6px;padding:8px 10px;font-size:13px;margin-top:4px';
+function openCreateExamModal(examId){
+  const ex=examId?allExams.find(e=>e.id===examId):null;
+  if(ex&&allResults.some(r=>r.exam_id===ex.id)&&!confirm('This exam already has student attempts. Editing questions can make old answers not match in the review. Continue?'))return;
+  editingExamId=ex?ex.id:null;questionCount=0;
   document.getElementById('questionsBuilder').innerHTML='';
   document.getElementById('createExamAlert').innerHTML='';
   populateDropdowns();renderBankPicker();
-  document.getElementById('examAssignAll').checked=true;toggleAssignAll();
-  document.getElementById('examTitle').value='';
-  document.getElementById('examSubject').value='';
-  document.getElementById('examLevel').value='';
-  document.getElementById('examDesc').value='';
-  document.getElementById('examDuration').value=30;
-  document.getElementById('examPass').value=60;
-  document.getElementById('examResultMode').value='auto';
-  addQuestion();
+  const set=(id,v)=>document.getElementById(id).value=v;
+  set('examTitle',ex?ex.title:'');set('examSubject',ex?ex.subject||'':'');set('examLevel',ex?ex.level||'':'');
+  set('examDesc',ex?ex.description||'':'');set('examDuration',ex?ex.duration_minutes:30);
+  set('examPass',ex?ex.passing_score:60);set('examResultMode',ex?ex.result_mode||'auto':'auto');
+  const assigned=ex?(ex.assigned_students||[]):[];
+  document.getElementById('examAssignAll').checked=!assigned.length;toggleAssignAll();
+  document.querySelectorAll('.examStudentChk').forEach(c=>c.checked=assigned.includes(c.value));
+  if(ex&&(ex.questions||[]).length)ex.questions.forEach(q=>addQuestion(q));else addQuestion();
+  document.querySelector('#modalCreateExam .modal-title').firstChild.textContent=ex?'Edit Exam ':'Create New Exam ';
   openModal('modalCreateExam');
 }
-
-function addQuestion(fromBank){
-  questionCount++;const idx=questionCount;
+function addQuestion(q){
+  q=q||{};questionCount++;const idx=questionCount;const t=qType(q);
   const div=document.createElement('div');div.className='question-builder';div.id=`qb-${idx}`;
-  const bankId=fromBank&&fromBank.id?fromBank.id:'';
-  const qText=fromBank?fromBank.text||'':'';
-  const qPoints=fromBank?(fromBank.points||1):1;
-  const qImage=fromBank?(fromBank.image||''):'';
-  const qAudio=fromBank?!!fromBank.audio_required:false;
-  const qOpts=fromBank?(fromBank.options||['','','','']):['','','',''];
-  const qCorrect=fromBank?(fromBank.correct||0):0;
+  const bankId=q.bank_id||(q.created_by&&q.id?q.id:'');
+  const opts=q.options||['','','',''];
   div.innerHTML=`<div class="q-num">Question ${idx}${bankId?' <span style="color:var(--muted);font-size:10px">(from bank)</span>':''}</div>
     <input type="hidden" id="q-bankid-${idx}" value="${bankId}"/>
     <button class="del-q-btn" onclick="removeQuestion(${idx})">✕ Remove</button>
     <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
       <div style="flex:1;min-width:200px"><label style="font-size:11px;color:var(--muted)">QUESTION TEXT</label>
-        <input type="text" id="q-text-${idx}" placeholder="Enter question text…" value="${qText.replace(/"/g,'&quot;')}" style="width:100%;background:#fff;border:2px solid var(--border);border-radius:6px;padding:8px 10px;font-size:13px;margin-top:4px"/>
-      </div>
+        <input type="text" id="q-text-${idx}" placeholder="Enter question text…" value="${esc(q.text)}" style="${INP}"/></div>
+      <div style="width:170px"><label style="font-size:11px;color:var(--muted)">TYPE</label>
+        <select id="q-type-${idx}" onchange="setQType(${idx})" style="${INP}">
+          <option value="mcq">Multiple choice</option><option value="tf">True / False</option>
+          <option value="fill">Fill in the blank</option><option value="match">Matching</option>
+          <option value="short">Written answer (manual)</option></select></div>
       <div style="width:90px"><label style="font-size:11px;color:var(--muted)">POINTS</label>
-        <input type="number" id="q-points-${idx}" value="${qPoints}" min="0.5" step="0.5" style="width:100%;background:#fff;border:2px solid var(--border);border-radius:6px;padding:8px;font-size:13px;margin-top:4px"/>
-      </div>
+        <input type="number" id="q-points-${idx}" value="${q.points||1}" min="0.5" step="0.5" style="${INP}"/></div>
     </div>
-    <div style="margin-bottom:10px">
-      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer">
-        <input type="checkbox" id="q-audio-${idx}" style="width:auto" ${qAudio?'checked':''} onchange="toggleQuestionAudio(${idx})"/> 🎙️ Audio answer (manual grading)
-      </label>
-    </div>
-    <div style="margin-bottom:10px">
-      <label style="font-size:11px;color:var(--muted)">ATTACH IMAGE (optional)</label>
+    <div style="margin-bottom:10px"><label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer">
+      <input type="checkbox" id="q-audio-${idx}" style="width:auto" ${q.audio_required?'checked':''} onchange="toggleQuestionAudio(${idx})"/> 🎙️ Audio answer (manual grading)</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#B45309;cursor:pointer;margin-top:6px">
+      <input type="checkbox" id="q-bonus-${idx}" style="width:auto" ${q.bonus?'checked':''}/> ⭐ Bonus question (adds points, not counted in the total)</label></div>
+    <div style="margin-bottom:10px"><label style="font-size:11px;color:var(--muted)">ATTACH IMAGE (optional)</label>
       <div style="margin-top:4px"><input type="file" accept="image/*" id="q-imgfile-${idx}" onchange="handleImagePick(this,'q-imgprev-${idx}','q-img-${idx}')"/>
-      <input type="hidden" id="q-img-${idx}" value="${qImage}"/>
-      <img id="q-imgprev-${idx}" class="q-img-preview" src="${qImage}" style="display:${qImage?'block':'none'}"/></div>
-    </div>
-    <div id="q-opts-${idx}">
-      <div style="font-size:11px;color:var(--muted);margin-bottom:6px">SELECT CORRECT ANSWER ☝️</div>
-      ${['A','B','C','D'].map((l,li)=>`<div class="option-input">
-        <input type="radio" name="correct-${idx}" value="${li}" id="r-${idx}-${li}" ${li===qCorrect?'checked':''}/>
-        <label for="r-${idx}-${li}">${l}</label>
-        <input type="text" id="q-opt-${idx}-${li}" placeholder="Option ${l}…" value="${(qOpts[li]||'').replace(/"/g,'&quot;')}"/>
-      </div>`).join('')}
+      <input type="hidden" id="q-img-${idx}" value="${q.image||''}"/>
+      <img id="q-imgprev-${idx}" class="q-img-preview" src="${q.image||''}" style="display:${q.image?'block':'none'}"/></div></div>
+    <div id="q-body-${idx}">
+      <div id="q-sec-mcq-${idx}"><div class="qtype-note">SELECT CORRECT ANSWER ☝️</div>
+        ${['A','B','C','D'].map((l,li)=>`<div class="option-input"><input type="radio" name="correct-${idx}" value="${li}" id="r-${idx}-${li}" ${li===(q.correct||0)&&t!=='tf'?'checked':''}/>
+        <label for="r-${idx}-${li}">${l}</label><input type="text" id="q-opt-${idx}-${li}" placeholder="Option ${l}…" value="${esc(t==='mcq'?opts[li]:'')}"/></div>`).join('')}</div>
+      <div id="q-sec-tf-${idx}"><div class="qtype-note">Correct answer:</div>
+        <label style="margin-right:16px"><input type="radio" name="tf-${idx}" value="0" style="width:auto" ${(q.correct||0)===0?'checked':''}/> True</label>
+        <label><input type="radio" name="tf-${idx}" value="1" style="width:auto" ${q.correct===1?'checked':''}/> False</label></div>
+      <div id="q-sec-fill-${idx}"><div class="qtype-note">Accepted answers — one per line (any of them is correct)</div>
+        <textarea id="q-fill-${idx}" style="${INP};min-height:70px">${esc((q.answers||[]).join('\n'))}</textarea></div>
+      <div id="q-sec-match-${idx}"><div class="qtype-note">Matching pairs: left item ↔ its correct match. Students see the right side shuffled.</div>
+        <div id="q-pairs-${idx}"></div><button class="btn-sm" type="button" onclick="addPairRow(${idx})">+ Add pair</button></div>
+      <div id="q-sec-short-${idx}"><div class="qtype-note">Student types a written answer. You grade it manually.</div></div>
     </div>`;
   document.getElementById('questionsBuilder').appendChild(div);
+  document.getElementById(`q-type-${idx}`).value=t;
+  const pairs=t==='match'&&(q.pairs||[]).length?q.pairs:[{l:'',r:''},{l:'',r:''}];
+  pairs.forEach(x=>addPairRow(idx,x.l,x.r));
+  setQType(idx);
+}
+function addPairRow(idx,l,r){
+  const d=document.createElement('div');d.className='pair-row';d.style.cssText='display:flex;gap:8px;align-items:center;margin-bottom:6px';
+  d.innerHTML=`<input type="text" class="pl" placeholder="Left item" value="${esc(l)}" style="${INP};margin:0"/><span>↔</span><input type="text" class="pr" placeholder="Matching item" value="${esc(r)}" style="${INP};margin:0"/><button class="btn-sm" type="button" onclick="this.parentNode.remove()">✕</button>`;
+  document.getElementById(`q-pairs-${idx}`).appendChild(d);
+}
+function setQType(idx){
+  const t=document.getElementById(`q-type-${idx}`).value;
+  ['mcq','tf','fill','match','short'].forEach(k=>document.getElementById(`q-sec-${k}-${idx}`).style.display=k===t?'block':'none');
   toggleQuestionAudio(idx);
 }
-
 function toggleQuestionAudio(idx){
   const on=document.getElementById(`q-audio-${idx}`).checked;
-  document.getElementById(`q-opts-${idx}`).style.opacity=on?'.4':'1';
+  document.getElementById(`q-body-${idx}`).style.opacity=on?'.4':'1';
 }
 function removeQuestion(idx){const el=document.getElementById(`qb-${idx}`);if(el)el.remove();}
 
@@ -1228,47 +1315,53 @@ async function saveExam(){
   const desc=document.getElementById('examDesc').value.trim();
   const resultMode=document.getElementById('examResultMode').value;
   const alertEl=document.getElementById('createExamAlert');
-  if(!title||!duration){alertEl.innerHTML='<div class="alert alert-error">Title and duration are required.</div>';return;}
-  const questions=[];
+  const fail=m=>{alertEl.innerHTML=`<div class="alert alert-error">${m}</div>`;alertEl.scrollIntoView({behavior:'smooth'});};
+  if(!title||!duration){fail('Title and duration are required.');return;}
+  const questions=[];let bad='';
   document.querySelectorAll('.question-builder').forEach(qb=>{
     const idx=qb.id.replace('qb-','');
     const text=document.getElementById(`q-text-${idx}`)?.value.trim();if(!text)return;
-    const options=[0,1,2,3].map(li=>document.getElementById(`q-opt-${idx}-${li}`)?.value.trim()||'');
-    const cr=qb.querySelector(`input[name="correct-${idx}"]:checked`);
-    const points=parseFloat(document.getElementById(`q-points-${idx}`)?.value)||1;
-    const audio_required=document.getElementById(`q-audio-${idx}`)?.checked||false;
-    const image=document.getElementById(`q-img-${idx}`)?.value||null;
-    const bank_id=document.getElementById(`q-bankid-${idx}`)?.value||null;
-    questions.push({text,options,correct:cr?parseInt(cr.value):0,points,audio_required,image,bank_id});
+    const type=document.getElementById(`q-type-${idx}`)?.value||'mcq';
+    const q={type,text,points:parseFloat(document.getElementById(`q-points-${idx}`)?.value)||1,
+      audio_required:document.getElementById(`q-audio-${idx}`)?.checked||false,
+      bonus:document.getElementById(`q-bonus-${idx}`)?.checked||false,
+      image:document.getElementById(`q-img-${idx}`)?.value||null,
+      bank_id:document.getElementById(`q-bankid-${idx}`)?.value||null,options:['','','',''],correct:0};
+    if(type==='mcq'){
+      q.options=[0,1,2,3].map(li=>document.getElementById(`q-opt-${idx}-${li}`)?.value.trim()||'');
+      const cr=qb.querySelector(`input[name="correct-${idx}"]:checked`);q.correct=cr?parseInt(cr.value):0;
+    }else if(type==='tf'){
+      q.options=['True','False'];const cr=qb.querySelector(`input[name="tf-${idx}"]:checked`);q.correct=cr?parseInt(cr.value):0;
+    }else if(type==='fill'){
+      q.answers=document.getElementById(`q-fill-${idx}`).value.split('\n').map(x=>x.trim()).filter(Boolean);
+      if(!q.answers.length)bad=`Question "${text.slice(0,30)}": add at least one accepted answer.`;
+    }else if(type==='match'){
+      q.pairs=[...qb.querySelectorAll('.pair-row')].map(r=>({l:r.querySelector('.pl').value.trim(),r:r.querySelector('.pr').value.trim()})).filter(x=>x.l&&x.r);
+      if(q.pairs.length<2)bad=`Question "${text.slice(0,30)}": matching needs at least 2 pairs.`;
+    }
+    questions.push(q);
   });
-  if(!questions.length){alertEl.innerHTML='<div class="alert alert-error">Add at least one question.</div>';return;}
+  if(bad){fail(bad);return;}
+  if(!questions.length){fail('Add at least one question.');return;}
   const assignAll=document.getElementById('examAssignAll').checked;
   const assigned_students=assignAll?[]:[...document.querySelectorAll('.examStudentChk:checked')].map(c=>c.value);
-  // auto_grade: false if resultMode=manual OR has audio questions
-  const hasAudio=questions.some(q=>q.audio_required);
-  const auto_grade=resultMode==='auto'&&!hasAudio;
+  const hasManual=questions.some(q=>q.audio_required||q.type==='short');
+  const auto_grade=resultMode==='auto'&&!hasManual;
+  const body={title,subject,level,duration_minutes:duration,passing_score:pass,description:desc,questions,assigned_students,auto_grade,result_mode:resultMode};
   showLoading('Saving exam…');
-  const res=await sb('exams',{method:'POST',body:JSON.stringify({
-    title,subject,level,duration_minutes:duration,passing_score:pass,description:desc,
-    questions,is_active:true,assigned_students,auto_grade,
-    result_mode:resultMode,created_by:currentUser.id,created_at:new Date().toISOString()
-  })});
+  const res=editingExamId
+    ?await sb(`exams?id=eq.${editingExamId}`,{method:'PATCH',body:JSON.stringify(body)})
+    :await sb('exams',{method:'POST',body:JSON.stringify({...body,is_active:true,created_by:currentUser.id,created_at:new Date().toISOString()})});
   const data=await res.json();
-  // Auto-save NEW questions (not from bank) to question bank
   if(res.ok){
-    const newOnes=questions.filter(q=>!q.bank_id);
-    if(newOnes.length){
-      showLoading('Saving new questions to bank…');
-      await Promise.all(newOnes.map(q=>sb('question_bank',{method:'POST',body:JSON.stringify({
-        subject,level,points:q.points,text:q.text,options:q.options,correct:q.correct,
-        audio_required:q.audio_required,image:q.image,created_by:currentUser.id,
-        created_at:new Date().toISOString()
-      })})));
+    if(!editingExamId){
+      const newOnes=questions.filter(q=>!q.bank_id&&q.type==='mcq');
+      if(newOnes.length){showLoading('Saving new questions to bank…');
+        await Promise.all(newOnes.map(q=>sb('question_bank',{method:'POST',body:JSON.stringify({subject,level,points:q.points,text:q.text,options:q.options,correct:q.correct,audio_required:q.audio_required,image:q.image,created_by:currentUser.id,created_at:new Date().toISOString()})})));}
     }
-    await loadAllData();hideLoading();
-    renderAdminExams();renderTeacherExamList();updateAdminStats();populateDropdowns();
-    closeModal('modalCreateExam');
-  }else{hideLoading();alertEl.innerHTML=`<div class="alert alert-error">${data.message||'Error saving exam.'}</div>`;}
+    editingExamId=null;await loadAllData();hideLoading();
+    renderAdminExams();renderTeacherExamList();updateAdminStats();populateDropdowns();closeModal('modalCreateExam');
+  }else{hideLoading();fail(data.message||'Error saving exam.');}
 }
 
 function renderAdminExams(){
@@ -1291,6 +1384,7 @@ function renderAdminExams(){
       </div>
       ${sched.length?`<div style="font-size:11px;color:var(--gold);margin-bottom:10px">🗓️ ${sched.length} schedule(s)</div>`:''}
       <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-sm" onclick="openCreateExamModal('${e.id}')">✏️ Edit</button>
         <button class="btn-sm" onclick="toggleExamActive('${e.id}',${!e.is_active})">${e.is_active?'⏸ Deactivate':'▶ Activate'}</button>
         <button class="btn-sm" style="color:var(--danger);border-color:var(--danger)" onclick="deleteExam('${e.id}')">🗑</button>
       </div>
@@ -1313,7 +1407,7 @@ function renderTeacherExamList(){
       <div style="font-size:11px;margin-bottom:10px">
         ${e.auto_grade===false||e.result_mode==='manual'?'<span class="badge badge-manual">✏️ Manual grading</span>':'<span class="badge badge-active">⚡ Auto result</span>'}
       </div>
-      <button class="btn-sm" onclick="openTeacherResultsForExam('${e.id}')">📊 View Results</button>
+      <button class="btn-sm" onclick="openCreateExamModal('${e.id}')">✏️ Edit</button> <button class="btn-sm" onclick="openTeacherResultsForExam('${e.id}')">📊 View Results</button>
     </div>`;
   }).join('');
 }
@@ -1468,6 +1562,7 @@ function renderResultsTable(){
       <td style="font-size:12px;color:var(--gold-pale)">${r.admin_note||'<span style="color:var(--muted)">—</span>'}</td>
       <td style="display:flex;gap:6px;flex-wrap:wrap">
         ${pending?`<button class="btn-sm" style="background:#2980b9;color:#fff;border-color:#2980b9" onclick="openManualGradeModal('${r.id}')">✏️ Grade</button>`:''}
+        <button class="btn-sm" onclick="openReview('${r.id}')">🔍 Review</button>
         <button class="btn-sm" onclick="openGradeModal('${r.id}','${(r.admin_note||'').replace(/'/g,"\\'")}')">📝 Note</button>
       </td>
     </tr>`;
@@ -1492,7 +1587,7 @@ function renderTeacherResultsTable(filterExamId){
       <td>${pending?'—':`<span style="color:${pct>=60?'var(--success)':'var(--danger)'};font-weight:600">${pct}%</span>`}</td>
       <td>${pending?'—':(getGrade(pct).split(' ')[1]||'')}</td>
       <td style="color:var(--muted);font-size:12px">${dt}</td>
-      <td>${pending?`<button class="btn-sm" style="background:#2980b9;color:#fff;border-color:#2980b9" onclick="openManualGradeModal('${r.id}')">✏️ Grade</button>`:'<span style="color:var(--muted)">—</span>'}</td>
+      <td>${pending?`<button class="btn-sm" style="background:#2980b9;color:#fff;border-color:#2980b9" onclick="openManualGradeModal('${r.id}')">✏️ Grade</button>`:''} <button class="btn-sm" onclick="openReview('${r.id}')">🔍 Review</button></td>
     </tr>`;
   }).join('');
 }
@@ -1515,7 +1610,8 @@ function openManualGradeModal(resultId){
       <div class="q-num">Question ${pm.index+1} — max ${pm.maxPoints} pts</div>
       <div style="margin-bottom:10px;font-weight:500">${q.text||''}</div>
       ${q.image?`<img src="${q.image}" class="q-img-preview"/>`:'' }
-      ${audio?`<audio controls src="${audio}" style="width:100%;margin:8px 0"></audio>`:'<div class="text-muted" style="font-size:12px">No audio recorded.</div>'}
+      ${typeof (r.answers||{})[pm.index]==='string'&&(r.answers||{})[pm.index]?`<div style="background:#F5FAFF;border:2px solid var(--border);border-radius:10px;padding:10px;margin:8px 0">${esc((r.answers||{})[pm.index])}</div>`:''}
+      ${audio?`<audio controls src="${audio}" style="width:100%;margin:8px 0"></audio>`:(q.audio_required?'<div class="text-muted" style="font-size:12px">No audio recorded.</div>':'')}
       <div class="field" style="margin-top:8px"><label>Points awarded</label>
         <input type="number" class="gmPointsInput" data-idx="${pm.index}" data-max="${pm.maxPoints}" min="0" max="${pm.maxPoints}" step="0.5" value="0"/>
       </div>
@@ -1661,7 +1757,7 @@ function renderQuestion(){
   const hasOptions=(q.options||[]).some(o=>o);
   document.getElementById('questionContainer').innerHTML=`<div class="question-card fade-in">
     <div class="question-num">Question ${questionIndex+1} of ${total}</div>
-    <div class="points-chip">${q.points||1} point${(q.points||1)>1?'s':''}</div>
+    <div class="points-chip">${q.bonus?'⭐ Bonus · ':''}${q.points||1} point${(q.points||1)>1?'s':''}</div>
     <div class="question-text">${q.text}</div>
     ${q.image?`<img src="${q.image}" style="max-width:100%;max-height:260px;border-radius:8px;margin-bottom:16px;border:1px solid var(--border)"/>`:'' }
     ${q.audio_required?`
@@ -1670,10 +1766,7 @@ function renderQuestion(){
         <button class="btn btn-outline" id="recBtn-${questionIndex}" onclick="toggleRecording(${questionIndex})" style="width:auto">⏺️ Start Recording</button>
         <div id="recPlayback-${questionIndex}" style="margin-top:10px">${audioAnswers[questionIndex]?`<audio controls src="${audioAnswers[questionIndex]}" style="width:100%"></audio>`:''}</div>
       </div>`:''}
-    ${hasOptions?`<div class="options" style="margin-top:16px">${q.options.map((opt,i)=>opt?`
-      <div class="option ${ans===i?'selected':''}" onclick="selectAnswer(${i})">
-        <div class="option-letter">${letters[i]}</div><span>${opt}</span>
-      </div>`:''  ).join('')}</div>`:''}
+    ${answerArea(q)}
   </div>`;
 }
 
@@ -1707,6 +1800,22 @@ async function toggleRecording(qIndex){
   }catch(e){alert('Microphone access denied. Please allow microphone in browser settings.');}
 }
 
+function answerArea(q){
+  const t=qType(q),a=answers[questionIndex],L=['A','B','C','D'];
+  const box='width:100%;margin-top:16px;padding:12px 14px;border:2px solid var(--border);border-radius:12px;font-size:15px;font-family:inherit';
+  if(t==='fill')return `<input type="text" value="${esc(a)}" placeholder="Type your answer…" oninput="answers[questionIndex]=this.value" style="${box}"/>`;
+  if(t==='short')return `<textarea placeholder="Write your answer…" oninput="answers[questionIndex]=this.value" style="${box};min-height:120px">${esc(a)}</textarea>`;
+  if(t==='match'){
+    const P=q.pairs||[];if(!q._shuf)q._shuf=P.map(x=>x.r).sort(()=>Math.random()-.5);
+    return `<div style="margin-top:16px">${P.map((x,k)=>`<div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+      <div style="flex:1;min-width:120px;padding:10px 12px;background:#EFF8FF;border:2px solid var(--border);border-radius:10px">${esc(x.l)}</div><span>↔</span>
+      <select onchange="setMatch(${k},this.value)" style="flex:1;min-width:120px;padding:10px;border:2px solid var(--border);border-radius:10px"><option value="">Choose…</option>
+      ${q._shuf.map(r=>`<option value="${esc(r)}" ${a&&a[k]===r?'selected':''}>${esc(r)}</option>`).join('')}</select></div>`).join('')}</div>`;
+  }
+  if(!(q.options||[]).some(o=>o))return '';
+  return `<div class="options" style="margin-top:16px">${q.options.map((opt,i)=>opt?`<div class="option ${a===i?'selected':''}" onclick="selectAnswer(${i})"><div class="option-letter">${L[i]}</div><span>${esc(opt)}</span></div>`:'').join('')}</div>`;
+}
+function setMatch(k,v){const a=Array.isArray(answers[questionIndex])?answers[questionIndex]:(answers[questionIndex]=[]);a[k]=v;}
 function selectAnswer(i){answers[questionIndex]=i;renderQuestion();}
 
 function nextQuestion(){
@@ -1724,9 +1833,9 @@ async function submitExam(timeUp){
   let correct=0,earnedPoints=0,totalPoints=0;
   const pendingManual=[];
   activeExam.questions.forEach((q,i)=>{
-    const pts=q.points||1;totalPoints+=pts;
-    if(q.audio_required){pendingManual.push({index:i,maxPoints:pts});return;}
-    if(answers[i]===q.correct){correct++;earnedPoints+=pts;}
+    const g=gradeQ(q,answers[i]);if(!q.bonus)totalPoints+=g.max;
+    if(g.status==='manual'){pendingManual.push({index:i,maxPoints:g.max});return;}
+    earnedPoints+=g.earned;if(g.status==='correct')correct++;
   });
   const total=activeExam.questions.length;
   // Grading mode: auto_grade=true AND no audio = instant result
@@ -1780,22 +1889,35 @@ function showResultPage(score,correct,total,passed,graded=true){
   if(currentUser.role==='student')renderStudentProfile();
 }
 
+function reviewHTML(ex,ans,audio){
+  const L=['A','B','C','D'];
+  const badge={correct:['✓ Correct','var(--success)'],wrong:['✗ Wrong','var(--danger)'],partial:['◐ Partial','#D97706'],manual:['✏️ Manual','#2980b9']};
+  return (ex.questions||[]).map((q,i)=>{
+    const a=ans[i],g=gradeQ(q,a),t=qType(q),b=badge[g.status];let body='';
+    if(t==='fill')body=`<div>Student: <strong style="color:${g.status==='correct'?'var(--success)':'var(--danger)'}">${esc(a)||'— no answer —'}</strong></div><div style="color:var(--muted);font-size:13px">Accepted: ${(q.answers||[]).map(esc).join(' / ')}</div>`;
+    else if(t==='short')body=`<div style="background:#F5FAFF;border:2px solid var(--border);border-radius:10px;padding:10px">${esc(a)||'— no answer —'}</div>`;
+    else if(t==='match')body=(q.pairs||[]).map((x,k)=>{const ok=a&&normA(a[k])===normA(x.r);return `<div style="display:flex;gap:8px;flex-wrap:wrap;margin:4px 0"><span>${esc(x.l)}</span><span>↔</span><strong style="color:${ok?'var(--success)':'var(--danger)'}">${esc(a&&a[k])||'—'}</strong>${ok?'':`<span style="color:var(--muted)">(correct: ${esc(x.r)})</span>`}</div>`;}).join('');
+    else if((q.options||[]).some(o=>o))body='<div class="options">'+q.options.map((o,oi)=>o?`<div class="option ${oi===q.correct?'correct':oi===a?'wrong':''}"><div class="option-letter">${L[oi]}</div><span>${esc(o)}</span>${oi===q.correct?'<span style="color:var(--success);font-size:12px;margin-left:auto">✓ Correct</span>':''}${oi===a&&a!==q.correct?'<span style="color:var(--danger);font-size:12px;margin-left:auto">✗ Student answer</span>':''}</div>`:'').join('')+'</div>'+((a===undefined||a===null)&&g.status!=='manual'?'<div style="color:var(--danger);font-size:12px;margin-top:6px">No answer given</div>':'');
+    if(audio&&audio[i])body+=`<audio controls src="${audio[i]}" style="width:100%;margin-top:8px"></audio>`;
+    return `<div class="question-card ${g.status==='correct'?'rv-ok':''}" style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;gap:8px"><div class="question-num">Question ${i+1}${q.bonus?' ⭐ Bonus':''}</div><div style="color:${b[1]};font-weight:600;font-size:13px">${b[0]} · ${g.status==='manual'?'?':+g.earned.toFixed(2)}/${g.max}</div></div><div class="question-text">${esc(q.text)}</div>${q.image?`<img src="${q.image}" style="max-width:100%;max-height:200px;border-radius:8px;margin-bottom:10px"/>`:''}${body}</div>`;
+  }).join('');
+}
+function openReview(id){
+  const r=allResults.find(x=>x.id===id);if(!r)return;
+  const ex=allExams.find(e=>e.id===r.exam_id);if(!ex){alert('Exam not found (deleted?).');return;}
+  const st=allStudents.find(x=>x.id===r.student_id)||{name:'Unknown'};
+  const G=(ex.questions||[]).map((q,i)=>gradeQ(q,(r.answers||{})[i]).status);
+  const c=k=>G.filter(x=>x===k).length;
+  document.getElementById('rvTitle').textContent=`${st.name} — ${ex.title}`;
+  document.getElementById('rvSummary').innerHTML=`${r.graded===false?'⏳ Pending':'Score: <strong>'+Math.round(r.score)+'%</strong>'} • ✓ ${c('correct')} correct • ✗ ${c('wrong')} wrong • ◐ ${c('partial')} partial • ✏️ ${c('manual')} manual`;
+  const rb=document.getElementById('rvBody');rb.classList.remove('only-wrong');
+  rb.innerHTML=reviewHTML(ex,r.answers||{},r.audio_answers||{});
+  document.querySelector('#modalReview input[type=checkbox]').checked=false;
+  openModal('modalReview');
+}
 function startReview(){
   const sec=document.getElementById('reviewSection');sec.style.display='block';
-  const letters=['A','B','C','D'];
-  sec.innerHTML=activeExam.questions.map((q,i)=>{
-    const ua=answers[i];const ca=q.correct;
-    return `<div class="question-card" style="margin-bottom:16px">
-      <div class="question-num">Question ${i+1} — ${q.points||1} pt${(q.points||1)>1?'s':''}</div>
-      <div class="question-text">${q.text}</div>
-      <div class="options">${(q.options||[]).map((opt,oi)=>opt?`
-        <div class="option ${oi===ca?'correct':oi===ua&&ua!==ca?'wrong':''}">
-          <div class="option-letter">${letters[oi]}</div><span>${opt}</span>
-          ${oi===ca?'<span style="color:var(--success);font-size:12px;margin-left:auto">✓ Correct</span>':''}
-          ${oi===ua&&ua!==ca?'<span style="color:var(--danger);font-size:12px;margin-left:auto">✗ Your answer</span>':''}
-        </div>`:''  ).join('')}</div>
-    </div>`;
-  }).join('');
+  sec.innerHTML=reviewHTML(activeExam,answers,audioAnswers);
   sec.scrollIntoView({behavior:'smooth'});
 }
 
