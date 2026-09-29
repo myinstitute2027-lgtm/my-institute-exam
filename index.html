@@ -231,7 +231,7 @@
       <div class="auth-sub">Exam & Learning Portal</div>
       <div id="loginAlert"></div>
       <div class="field"><label>Username</label><input type="text" id="loginUsername" placeholder="Enter username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"/></div>
-      <div class="field"><label>Password</label><input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false"/></div>
+      <div class="field"><label>Password</label><div style="position:relative"><input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" style="padding-right:64px"/><button type="button" id="pwToggle" onclick="togglePw()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--gold);font-size:12px;font-weight:600;cursor:pointer;padding:6px">Show</button></div></div>
       <button class="btn btn-primary" onclick="login()">Sign In</button>
       <div style="margin-top:20px;font-size:13px;color:var(--muted)">Don't have an account? <a style="color:var(--gold);cursor:pointer" onclick="showPage('page-register')">Request Access</a></div>
     </div>
@@ -810,6 +810,10 @@ const showLoading=(msg='Loading…')=>{document.getElementById('loadingText').te
 const hideLoading=()=>document.getElementById('loadingOverlay').classList.remove('show');
 
 // ── AUTH ─────────────────────────────────────
+function togglePw(){
+  const i=document.getElementById('loginPassword'),b=document.getElementById('pwToggle');
+  const show=i.type==='password';i.type=show?'text':'password';b.textContent=show?'Hide':'Show';
+}
 async function login(){
   const username=document.getElementById('loginUsername').value.trim();
   const password=document.getElementById('loginPassword').value.trim();
@@ -990,7 +994,7 @@ async function afterLogin(){
 function logout(){
   store.del('mi_user');currentUser=null;clearInterval(timerInterval);
   document.getElementById('mainHeader').style.display='none';
-  document.getElementById('loginUsername').value='';document.getElementById('loginPassword').value='';
+  document.getElementById('loginUsername').value='';document.getElementById('loginPassword').value='';document.getElementById('loginPassword').type='password';document.getElementById('pwToggle').textContent='Show';
   document.getElementById('loginAlert').innerHTML='';showPage('page-login');
 }
 
