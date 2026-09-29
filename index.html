@@ -225,8 +225,8 @@
       <div class="auth-title">MY Institute</div>
       <div class="auth-sub">Exam & Learning Portal</div>
       <div id="loginAlert"></div>
-      <div class="field"><label>Username</label><input type="text" id="loginUsername" placeholder="Enter username" autocomplete="username"/></div>
-      <div class="field"><label>Password</label><input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password"/></div>
+      <div class="field"><label>Username</label><input type="text" id="loginUsername" placeholder="Enter username" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"/></div>
+      <div class="field"><label>Password</label><input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false"/></div>
       <button class="btn btn-primary" onclick="login()">Sign In</button>
       <div style="margin-top:20px;font-size:13px;color:var(--muted)">Don't have an account? <a style="color:var(--gold);cursor:pointer" onclick="showPage('page-register')">Request Access</a></div>
     </div>
@@ -768,9 +768,16 @@ let mediaRecorderCurrent=null,mediaChunksCurrent=[],mediaStreamCurrent=null;
 const todayStr=()=>new Date().toISOString().slice(0,10);
 
 // ── INIT ─────────────────────────────────────
+const store={
+  get:k=>{try{return sessionStorage.getItem(k);}catch(e){return null;}},
+  set:(k,v)=>{try{sessionStorage.setItem(k,v);}catch(e){}},
+  del:k=>{try{sessionStorage.removeItem(k);}catch(e){}}
+};
 window.onload=async()=>{
-  const saved=sessionStorage.getItem('mi_user');
-  if(saved){currentUser=JSON.parse(saved);await afterLogin();}
+  try{
+    const saved=store.get('mi_user');
+    if(saved){currentUser=JSON.parse(saved);await afterLogin();}
+  }catch(e){store.del('mi_user');currentUser=null;hideLoading();showPage('page-login');}
   setInterval(updateScheduleCountdowns,1000);
 };
 
@@ -780,19 +787,36 @@ const hideLoading=()=>document.getElementById('loadingOverlay').classList.remove
 // ── AUTH ─────────────────────────────────────
 async function login(){
   const username=document.getElementById('loginUsername').value.trim();
-  const password=document.getElementById('loginPassword').value;
+  const password=document.getElementById('loginPassword').value.trim();
   const alertEl=document.getElementById('loginAlert');
+  const err=m=>{alertEl.innerHTML='<div class="alert alert-error">'+m+'</div>';hideLoading();};
   alertEl.innerHTML='';
-  if(!username||!password){alertEl.innerHTML='<div class="alert alert-error">Please enter username and password.</div>';return;}
+  if(!username||!password){err('Please enter username and password.');return;}
   showLoading('Signing in…');
+  let user;
   try{
-    const res=await sb(`users?username=eq.${encodeURIComponent(username)}&select=*`);
+    // case-insensitive username lookup (phones often capitalize the first letter)
+    const res=await sb(`users?username=ilike.${encodeURIComponent(username)}&select=*`);
     const users=await res.json();
-    if(!users||!users.length){alertEl.innerHTML='<div class="alert alert-error">User not found.</div>';hideLoading();return;}
-    const user=users[0];
-    if(user.password!==password){alertEl.innerHTML='<div class="alert alert-error">Incorrect password.</div>';hideLoading();return;}
-    currentUser=user;sessionStorage.setItem('mi_user',JSON.stringify(user));await afterLogin();
-  }catch(e){alertEl.innerHTML='<div class="alert alert-error">Connection error.</div>';hideLoading();}
+    if(!res.ok||!Array.isArray(users)){
+      console.error('Login query failed',res.status,users);
+      err('Server error ('+res.status+'). Please tell the administrator.');return;
+    }
+    user=users.find(u=>(u.username||'').trim().toLowerCase()===username.toLowerCase());
+    if(!user){err('User not found.');return;}
+    if(String(user.password||'').trim()!==password){err('Incorrect password.');return;}
+  }catch(e){
+    console.error(e);
+    err('Cannot reach the server. Check your internet connection and try again.');return;
+  }
+  try{
+    currentUser=user;store.set('mi_user',JSON.stringify(user));
+    await afterLogin();
+  }catch(e){
+    console.error(e);
+    currentUser=null;store.del('mi_user');
+    err('Signed in, but loading data failed. Please refresh and try again.');
+  }
 }
 
 async function afterLogin(){
@@ -835,7 +859,7 @@ async function afterLogin(){
 }
 
 function logout(){
-  sessionStorage.removeItem('mi_user');currentUser=null;clearInterval(timerInterval);
+  store.del('mi_user');currentUser=null;clearInterval(timerInterval);
   document.getElementById('mainHeader').style.display='none';
   document.getElementById('loginUsername').value='';document.getElementById('loginPassword').value='';
   document.getElementById('loginAlert').innerHTML='';showPage('page-login');
