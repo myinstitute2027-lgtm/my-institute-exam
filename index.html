@@ -827,9 +827,11 @@ async function login(){
       console.error('Login query failed',res.status,users);
       err('Server error ('+res.status+'). Please tell the administrator.');return;
     }
-    user=users.find(u=>(u.username||'').trim().toLowerCase()===username.toLowerCase());
-    if(!user){err('User not found.');return;}
-    if(String(user.password||'').trim()!==password){err('Incorrect password.');return;}
+    const cands=users.filter(u=>(u.username||'').trim().toLowerCase()===username.toLowerCase());
+    if(!cands.length){err('User not found.');return;}
+    // several accounts can differ only by letter case: accept the one whose password matches
+    user=cands.find(u=>String(u.password??'').trim()===password);
+    if(!user){err('Incorrect password.');return;}
   }catch(e){
     console.error(e);
     err('Cannot reach the server. Check your internet connection and try again.');return;
