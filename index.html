@@ -690,6 +690,14 @@
         </select>
       </div>
     </div>
+    <div style="background:#F5FAFF;border:2px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px">🗓️ Availability window (optional)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field" style="margin-bottom:0"><label>Opens (date & time)</label><input type="datetime-local" id="examOpens"/></div>
+        <div class="field" style="margin-bottom:0"><label>Closes (date & time)</label><input type="datetime-local" id="examCloses"/></div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:8px">Leave both empty = always available. Students can only start the exam inside this window. Saving replaces any existing schedule for this exam.</div>
+    </div>
     <div class="field"><label>Description</label><textarea id="examDesc" placeholder="Brief description…" style="min-height:60px"></textarea></div>
     <hr class="divider"/>
     <div class="field">
@@ -734,7 +742,7 @@
     </div>
     <div class="field"><label>Notes (optional)</label><input type="text" id="schedNotes" placeholder="e.g. Open to Level 1 students only"/></div>
     <div style="background:var(--dark);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--muted)">
-      💡 Students can take the exam once per day during the open window.
+      💡 Students can start the exam only during the open window, and only once.
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('modalSchedule')">Cancel</button>
@@ -1301,6 +1309,14 @@ const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(
 const normA=s=>String(s??'').toLowerCase().replace(/[\u064B-\u0652\u0640]/g,'').replace(/[أإآ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/\s+/g,' ').trim();
 const qType=q=>q.type||'mcq';
 let editingExamId=null;
+const toLocalInput=iso=>{const d=new Date(iso),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;};
+async function saveExamWindow(exId,o,c){
+  if(!exId)return;
+  const old=allSchedules.filter(x=>x.exam_id===exId);
+  if(!o&&!old.length)return;
+  for(const x of old)await sb(`schedules?id=eq.${x.id}`,{method:'DELETE',prefer:''});
+  if(o)await sb('schedules',{method:'POST',body:JSON.stringify({exam_id:exId,opens_at:o,closes_at:c,notes:'',created_at:new Date().toISOString()})});
+}
 function gradeQ(q,a){
   const max=q.points||1,t=qType(q);
   if(q.audio_required||t==='short')return{max,earned:0,status:'manual'};
@@ -1321,6 +1337,9 @@ function openCreateExamModal(examId){
   set('examTitle',ex?ex.title:'');set('examSubject',ex?ex.subject||'':'');set('examLevel',ex?ex.level||'':'');
   set('examDesc',ex?ex.description||'':'');set('examDuration',ex?ex.duration_minutes:30);
   set('examPass',ex?ex.passing_score:60);set('examResultMode',ex?ex.result_mode||'auto':'auto');
+  const sc=ex?allSchedules.filter(x=>x.exam_id===ex.id).sort((a,b)=>new Date(a.opens_at)-new Date(b.opens_at)):[];
+  const cur=sc.find(x=>new Date(x.closes_at)>=new Date())||sc[0];
+  set('examOpens',cur?toLocalInput(cur.opens_at):'');set('examCloses',cur?toLocalInput(cur.closes_at):'');
   const assigned=ex?(ex.assigned_students||[]):[];
   document.getElementById('examAssignAll').checked=!assigned.length;toggleAssignAll();
   document.querySelectorAll('.examStudentChk').forEach(c=>c.checked=assigned.includes(c.value));
@@ -1427,6 +1446,10 @@ async function saveExam(){
   });
   if(bad){fail(bad);return;}
   if(!questions.length){fail('Add at least one question.');return;}
+  const oV=document.getElementById('examOpens').value,cV=document.getElementById('examCloses').value;
+  if((oV||cV)&&!(oV&&cV)){fail('Fill both Opens and Closes, or leave both empty.');return;}
+  if(oV&&new Date(oV)>=new Date(cV)){fail('Closes time must be after the Opens time.');return;}
+  const opensISO=oV?new Date(oV).toISOString():'',closesISO=cV?new Date(cV).toISOString():'';
   const assignAll=document.getElementById('examAssignAll').checked;
   const assigned_students=assignAll?[]:[...document.querySelectorAll('.examStudentChk:checked')].map(c=>c.value);
   const hasManual=questions.some(q=>q.audio_required||q.type==='short');
@@ -1438,6 +1461,7 @@ async function saveExam(){
     :await sb('exams',{method:'POST',body:JSON.stringify({...body,is_active:true,created_by:currentUser.id,created_at:new Date().toISOString()})});
   const data=await res.json();
   if(res.ok){
+    await saveExamWindow(editingExamId||(data&&data[0]&&data[0].id),opensISO,closesISO);
     if(!editingExamId){
       const newOnes=questions.filter(q=>!q.bank_id&&q.type==='mcq');
       if(newOnes.length){showLoading('Saving new questions to bank…');
@@ -1515,7 +1539,7 @@ async function saveSchedule(){
   if(!examId||!opensAt||!closesAt){alertEl.innerHTML='<div class="alert alert-error">Please fill all fields.</div>';return;}
   if(new Date(opensAt)>=new Date(closesAt)){alertEl.innerHTML='<div class="alert alert-error">Close time must be after open time.</div>';return;}
   showLoading('Saving schedule…');
-  const res=await sb('schedules',{method:'POST',body:JSON.stringify({exam_id:examId,opens_at:opensAt,closes_at:closesAt,notes,created_at:new Date().toISOString()})});
+  const res=await sb('schedules',{method:'POST',body:JSON.stringify({exam_id:examId,opens_at:new Date(opensAt).toISOString(),closes_at:new Date(closesAt).toISOString(),notes,created_at:new Date().toISOString()})});
   hideLoading();
   if(res.ok){await loadAllData();renderScheduleList();populateDropdowns();closeModal('modalSchedule');alertEl.innerHTML='';}
   else{alertEl.innerHTML='<div class="alert alert-error">Error saving schedule.</div>';}
@@ -1786,7 +1810,8 @@ function renderAvailableExams(){
     if(e.assigned_students&&e.assigned_students.length&&!e.assigned_students.includes(currentUser.id))return false;
     const sched=allSchedules.find(s=>s.exam_id===e.id&&new Date(s.opens_at)<=now&&new Date(s.closes_at)>=now);
     const hasSched=allSchedules.some(s=>s.exam_id===e.id);
-    return !hasSched||!!sched;
+    const upc=allSchedules.some(s=>s.exam_id===e.id&&new Date(s.opens_at)>now);
+    return !hasSched||!!sched||upc;
   });
   if(!active.length){container.innerHTML='<div class="empty-state" style="grid-column:1/-1"><div class="icon">📝</div><p>No exams available right now.<br><span style="font-size:13px">Check back soon!</span></p></div>';return;}
   const icons=['📖','✍️','☪️','🌙','⭐','📝'];
@@ -1797,6 +1822,7 @@ function renderAvailableExams(){
     const best=myRes.filter(r=>r.graded!==false).length?Math.max(...myRes.filter(r=>r.graded!==false).map(r=>r.score)):null;
     const sched=allSchedules.find(s=>s.exam_id===e.id&&new Date(s.opens_at)<=now&&new Date(s.closes_at)>=now);
     const doneToday=myRes.length>0;
+    const upcoming=!sched&&allSchedules.filter(s=>s.exam_id===e.id&&new Date(s.opens_at)>now).sort((a,b)=>new Date(a.opens_at)-new Date(b.opens_at))[0];
     const pendingMine=myRes.some(r=>r.graded===false&&r.admin_note!==STARTED_NOTE);
     return `<div class="card" style="border-top:4px solid ${borders[idx%6]};background:${bgs[idx%6]}">
       <div style="font-size:36px;margin-bottom:10px">${icons[idx%6]}</div>
@@ -1806,7 +1832,7 @@ function renderAvailableExams(){
       ${sched?`<div style="font-size:11px;color:var(--success);margin-bottom:10px">🟢 Open until ${new Date(sched.closes_at).toLocaleString()}</div>`:''}
       ${pendingMine?`<div class="alert alert-info" style="margin-bottom:10px;font-size:12px">⏳ A previous result is pending grading</div>`:''}
       ${best!==null?`<div class="alert alert-info" style="margin-bottom:10px;font-size:12px">Best score: <strong>${Math.round(best)}%</strong></div>`:''}
-      ${doneToday
+      ${upcoming&&!doneToday?`<div class="alert alert-info" style="margin-bottom:10px;font-size:12px">🗓️ Opens ${new Date(upcoming.opens_at).toLocaleString()}<br>Closes ${new Date(upcoming.closes_at).toLocaleString()}</div><button class="btn btn-ghost" disabled style="cursor:not-allowed;opacity:.6">🔒 Not open yet</button>`:doneToday
         ?`<button class="btn btn-ghost" disabled style="cursor:not-allowed;opacity:.6">✅ Already taken</button>`
         :`<button class="btn btn-primary" onclick="startExam('${e.id}')">Start Exam →</button>`
       }
@@ -1821,6 +1847,9 @@ async function startExam(examId){
   const exam=allExams.find(e=>e.id===examId);
   if(!exam||!(exam.questions||[]).length){alert('This exam has no questions yet.');return;}
   if(allResults.some(r=>r.student_id===currentUser.id&&r.exam_id===examId)){alert('You have already taken this exam. It can only be taken once.');return;}
+  const scs=allSchedules.filter(x=>x.exam_id===examId);
+  if(scs.length){const n=new Date();
+    if(!scs.some(x=>new Date(x.opens_at)<=n&&new Date(x.closes_at)>=n)){alert('This exam is not open right now.');renderAvailableExams();return;}}
   if(!confirm(`Start "${exam.title}"?\n⏱ Duration: ${exam.duration_minutes} minutes\n❓ Questions: ${exam.questions.length}\n\n⚠️ You can enter this exam ONLY ONCE. Do not close or refresh the page until you submit.`))return;
   showLoading('Starting exam…');
   try{
