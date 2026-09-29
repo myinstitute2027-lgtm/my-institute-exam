@@ -296,6 +296,11 @@
       <div class="section-title"><span>🏆</span> Hall of Excellence — Top Students</div>
       <div id="leaderboardList"><div class="empty-state"><div class="icon">🎓</div><p>No results yet. Be the first!</p></div></div>
     </div>
+    <div id="ratingSection" class="insp-card" style="display:none">
+      <div class="section-title" style="margin-bottom:12px"><span>⭐</span> Rate Your Teacher</div>
+      <div id="rtAlert"></div>
+      <div id="rtBody"></div>
+    </div>
     <div id="tipsRow" style="display:none">
       <div class="tips-row">
         <div class="tip-card"><div class="tip-icon">📖</div><div><div class="tip-title">Read carefully</div><div class="tip-desc">Take your time reading each question</div></div></div>
@@ -320,6 +325,7 @@
         <button class="btn btn-outline" onclick="showAdminTab('results')">📊 Results</button>
         <button class="btn btn-outline" onclick="showAdminTab('discounts')">🎁 Gifts</button>
         <button class="btn btn-outline" onclick="showAdminTab('reports')">📈 Reports</button>
+        <button class="btn btn-outline" onclick="showAdminTab('ratings')">⭐ Ratings</button>
       </div>
     </div>
     <div id="teacherNav" style="display:none">
@@ -328,6 +334,7 @@
         <button class="btn btn-outline" onclick="showTeacherTab('bank')">📚 My Questions</button>
         <button class="btn btn-outline" onclick="showTeacherTab('exams')">📋 My Exams</button>
         <button class="btn btn-outline" onclick="showTeacherTab('results')">📊 Results</button>
+        <button class="btn btn-outline" onclick="showTeacherTab('ratings')">⭐ My Ratings</button>
       </div>
     </div>
   </div>
@@ -344,6 +351,7 @@
       <button class="tab" onclick="switchAdminTab('results')" id="tabBtn-results">📊 Results</button>
       <button class="tab" onclick="switchAdminTab('discounts')" id="tabBtn-discounts">🎁 Gifts</button>
       <button class="tab" onclick="switchAdminTab('reports')" id="tabBtn-reports">📈 Reports</button>
+      <button class="tab" onclick="switchAdminTab('ratings')" id="tabBtn-ratings">⭐ Ratings</button>
     </div>
 
     <!-- STUDENTS TAB -->
@@ -447,6 +455,7 @@
     </div>
 
     <!-- REPORTS TAB -->
+    <div id="adminTab-ratings" style="display:none"><div id="adminRatingsList"></div></div>
     <div id="adminTab-reports" style="display:none">
       <div class="section-title">📈 Admin Reports</div>
       <div class="grid grid-2" style="max-width:700px">
@@ -473,6 +482,7 @@
       <button class="tab active" onclick="switchTeacherTab('bank')" id="teacherTabBtn-bank">📚 My Questions</button>
       <button class="tab" onclick="switchTeacherTab('exams')" id="teacherTabBtn-exams">📋 My Exams</button>
       <button class="tab" onclick="switchTeacherTab('results')" id="teacherTabBtn-results">📊 Results</button>
+      <button class="tab" onclick="switchTeacherTab('ratings')" id="teacherTabBtn-ratings">⭐ My Ratings</button>
     </div>
     <div id="teacherTab-bank">
       <div class="section-header">
@@ -493,6 +503,7 @@
       </div>
       <div class="grid grid-2" id="teacherExamList"></div>
     </div>
+    <div id="teacherTab-ratings" style="display:none"><div id="teacherRatingsList"></div></div>
     <div id="teacherTab-results" style="display:none">
       <div class="section-title">📊 Results for My Exams</div>
       <div class="table-wrap">
@@ -775,7 +786,7 @@ const sb=(path,opts={})=>fetch(`${SB_URL}/rest/v1/${path}`,{headers:{'apikey':SB
 
 // ── STATE ────────────────────────────────────
 let currentUser=null,allStudents=[],allExams=[],allResults=[],allDiscounts=[],allSchedules=[];
-let allQuestionBank=[],allNotifications=[],allTeachers=[];
+let allQuestionBank=[],allNotifications=[],allTeachers=[],allRatings=[],ratingsOk=true;
 let activeExam=null,answers={},audioAnswers={},timerInterval=null,timeLeft=0,examStartTime=null;
 let questionIndex=0,lastResult=null,questionCount=0;
 let mediaRecorderCurrent=null,mediaChunksCurrent=[],mediaStreamCurrent=null;
@@ -869,6 +880,69 @@ function renderInspiration(shuffle){
     ${q.s?`<div class="insp-src">\u2014 ${esc(q.s)}</div>`:''}
     <button class="btn-sm" style="margin-top:12px" onclick="renderInspiration(true)">\ud83d\udd04 Another one</button>`;
 }
+// ── TEACHER RATINGS ───────────────────────────
+let rtStars=0;
+const starStr=n=>'★'.repeat(Math.round(n))+'☆'.repeat(5-Math.round(n));
+function renderRatingForm(){
+  const body=document.getElementById('rtBody');if(!body)return;
+  if(!allTeachers.length){body.innerHTML='<div class="text-muted">No teachers available to rate yet.</div>';return;}
+  body.innerHTML=`<div class="field"><label>Teacher</label><select id="rtTeacher" onchange="fillRating()">${allTeachers.map(t=>`<option value="${esc(t.id)}">${esc(t.name)}</option>`).join('')}</select></div>
+    <div class="field"><label>Your rating</label><div id="rtStars" style="font-size:34px;cursor:pointer;color:#F59E0B;letter-spacing:4px;user-select:none"></div></div>
+    <div class="field"><label>Comment (optional)</label><textarea id="rtComment" placeholder="Tell us about your experience with this teacher…"></textarea></div>
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:14px;cursor:pointer"><input type="checkbox" id="rtAnon" style="width:auto"/> Send anonymously (the teacher will not see my name)</label>
+    <button class="btn btn-primary" id="rtBtn" style="width:auto;padding:10px 24px" onclick="submitRating()">Submit Rating</button>`;
+  fillRating();
+}
+function drawStars(){document.getElementById('rtStars').innerHTML=[1,2,3,4,5].map(n=>`<span onclick="setStars(${n})">${n<=rtStars?'★':'☆'}</span>`).join('');}
+function setStars(n){rtStars=n;drawStars();}
+function myRating(tid){return allRatings.find(r=>String(r.student_id)===String(currentUser.id)&&String(r.teacher_id)===String(tid));}
+function fillRating(){
+  const ex=myRating(document.getElementById('rtTeacher').value);
+  rtStars=ex?ex.rating:0;drawStars();
+  document.getElementById('rtComment').value=ex?ex.comment||'':'';
+  document.getElementById('rtAnon').checked=!!(ex&&ex.anonymous);
+  document.getElementById('rtBtn').textContent=ex?'Update Rating':'Submit Rating';
+}
+async function submitRating(){
+  const al=document.getElementById('rtAlert');const tid=document.getElementById('rtTeacher').value;
+  if(!rtStars){al.innerHTML='<div class="alert alert-error">Please choose a star rating (1–5).</div>';return;}
+  const ex=myRating(tid);
+  const body={student_id:String(currentUser.id),teacher_id:String(tid),rating:rtStars,comment:document.getElementById('rtComment').value.trim(),anonymous:document.getElementById('rtAnon').checked};
+  showLoading('Sending…');
+  try{
+    const res=await sb(ex?`teacher_ratings?id=eq.${ex.id}`:'teacher_ratings',{method:ex?'PATCH':'POST',body:JSON.stringify(ex?body:{...body,created_at:new Date().toISOString()})});
+    if(!res.ok)throw new Error(res.status);
+    await loadAllData();hideLoading();
+    al.innerHTML='<div class="alert alert-success">Thank you! Your rating was saved. ⭐</div>';fillRating();
+  }catch(e){
+    hideLoading();
+    al.innerHTML='<div class="alert alert-error">'+(!ratingsOk?'Ratings are not set up yet. Please tell the administrator.':'Could not save your rating. Please try again.')+'</div>';
+  }
+}
+function renderRatings(containerId,onlyTeacherId){
+  const box=document.getElementById(containerId);if(!box)return;
+  if(!ratingsOk){box.innerHTML='<div class="alert alert-error">The <b>teacher_ratings</b> table is not created in Supabase yet.</div>';return;}
+  const isAdmin=currentUser.role==='admin';
+  const teachers=onlyTeacherId?allTeachers.filter(t=>String(t.id)===String(onlyTeacherId)):allTeachers;
+  if(!teachers.length){box.innerHTML='<div class="empty-state"><div class="icon">⭐</div><p>No teachers yet</p></div>';return;}
+  box.innerHTML=teachers.map(t=>{
+    const rs=allRatings.filter(r=>String(r.teacher_id)===String(t.id));
+    const avg=rs.length?rs.reduce((a,r)=>a+r.rating,0)/rs.length:0;
+    const items=rs.map(r=>{
+      const st=allStudents.find(x=>String(x.id)===String(r.student_id))||{name:'Unknown'};
+      const who=r.anonymous?(isAdmin?esc(st.name)+' <span class="text-muted">(anonymous to teacher)</span>':'Anonymous'):esc(st.name);
+      let dt='';try{dt=new Date(r.created_at).toLocaleDateString();}catch{}
+      return `<div style="border-top:1px solid var(--border);padding:10px 0"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><div><strong>${who}</strong> <span style="color:#F59E0B">${starStr(r.rating)}</span></div><div class="text-muted" style="font-size:12px">${dt}${isAdmin?` <button class="btn-sm" style="color:var(--danger);border-color:var(--danger)" onclick="deleteRating('${r.id}')">🗑</button>`:''}</div></div>${r.comment?`<div style="margin-top:4px;font-size:14px">${esc(r.comment)}</div>`:''}</div>`;
+    }).join('');
+    return `<div class="card" style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><div class="card-title">${esc(t.name)}</div><div><span style="color:#F59E0B;font-size:18px">${rs.length?starStr(avg):'—'}</span> <strong>${rs.length?avg.toFixed(1):''}</strong> <span class="text-muted" style="font-size:12px">(${rs.length} rating${rs.length===1?'':'s'})</span></div></div>${items||'<div class="text-muted" style="margin-top:8px">No ratings yet.</div>'}</div>`;
+  }).join('');
+}
+async function deleteRating(id){
+  if(!confirm('Delete this rating?'))return;
+  showLoading('Deleting…');await sb(`teacher_ratings?id=eq.${id}`,{method:'DELETE',prefer:''});
+  await loadAllData();renderRatings('adminRatingsList');hideLoading();
+}
+
 async function afterLogin(){
   showLoading('Loading data…');
   document.getElementById('mainHeader').style.display='block';
@@ -885,6 +959,7 @@ async function afterLogin(){
     document.getElementById('teacherNav').style.display='none';
     document.getElementById('studentExamsSection').style.display='none';
     document.getElementById('tipsRow').style.display='none';
+    document.getElementById('ratingSection').style.display='none';
   }else if(currentUser.role==='teacher'){
     document.getElementById('adminStats').style.display='none';
     document.getElementById('adminNav').style.display='none';
@@ -898,6 +973,7 @@ async function afterLogin(){
     document.getElementById('tipsRow').style.display='block';
     document.getElementById('studentExamsSection').style.display='block';
     renderAvailableExams();renderStudentProfile();renderNotifBanner();
+    document.getElementById('ratingSection').style.display='block';renderRatingForm();
   }
   renderLeaderboard();updateAdminStats();showPage('page-home');
   document.getElementById('homeWelcome').textContent=`Welcome, ${currentUser.name}!`;
@@ -918,21 +994,23 @@ function logout(){
 
 // ── DATA ─────────────────────────────────────
 async function loadAllData(){
-  const [sR,eR,rR,dR,scR,bR,nR]=await Promise.all([
+  const [sR,eR,rR,dR,scR,bR,nR,tR]=await Promise.all([
     sb('users?select=*&order=name.asc'),
     sb('exams?select=*&order=created_at.desc'),
     sb('results?select=*&order=submitted_at.desc'),
     sb('discounts?select=*&order=created_at.desc'),
     sb('schedules?select=*&order=opens_at.asc'),
     sb('question_bank?select=*&order=created_at.desc'),
-    sb('notifications?select=*&order=created_at.desc')
+    sb('notifications?select=*&order=created_at.desc'),
+    sb('teacher_ratings?select=*&order=created_at.desc')
   ]);
+  ratingsOk=tR.ok;
   const j=async r=>{try{const d=await r.json();return Array.isArray(d)?d:[];}catch{return [];}};
   const allUsers=await j(sR);
   allStudents=allUsers.filter(u=>u.role==='student');
   allTeachers=allUsers.filter(u=>u.role==='teacher');
-  [,allExams,allResults,allDiscounts,allSchedules,allQuestionBank,allNotifications]=
-    await Promise.all([Promise.resolve(allUsers),j(eR),j(rR),j(dR),j(scR),j(bR),j(nR)]);
+  [,allExams,allResults,allDiscounts,allSchedules,allQuestionBank,allNotifications,allRatings]=
+    await Promise.all([Promise.resolve(allUsers),j(eR),j(rR),j(dR),j(scR),j(bR),j(nR),j(tR)]);
 }
 
 // ── LEADERBOARD ──────────────────────────────
@@ -1563,6 +1641,7 @@ function renderResultsTable(){
       <td style="display:flex;gap:6px;flex-wrap:wrap">
         ${pending?`<button class="btn-sm" style="background:#2980b9;color:#fff;border-color:#2980b9" onclick="openManualGradeModal('${r.id}')">✏️ Grade</button>`:''}
         <button class="btn-sm" onclick="openReview('${r.id}')">🔍 Review</button>
+        <button class="btn-sm" title="Delete this attempt so the student can retake" style="color:var(--danger);border-color:var(--danger)" onclick="deleteResult('${r.id}')">🔁 Allow retake</button>
         <button class="btn-sm" onclick="openGradeModal('${r.id}','${(r.admin_note||'').replace(/'/g,"\\'")}')">📝 Note</button>
       </td>
     </tr>`;
@@ -1643,6 +1722,14 @@ async function publishManualGrade(){
   await loadAllData();hideLoading();closeModal('modalGradeManual');renderResultsTable();renderTeacherResultsTable();
 }
 
+async function deleteResult(id){
+  const r=allResults.find(x=>x.id===id);if(!r)return;
+  const st=allStudents.find(x=>x.id===r.student_id)||{name:'this student'};
+  if(!confirm(`Delete ${st.name}'s attempt so they can take the exam again?\nTheir score and answers for this attempt will be permanently removed.`))return;
+  showLoading('Deleting…');
+  await sb(`results?id=eq.${id}`,{method:'DELETE',prefer:''});
+  await loadAllData();renderResultsTable();renderLeaderboard();updateAdminStats();hideLoading();
+}
 function openGradeModal(id,note){document.getElementById('gradeResultId').value=id;document.getElementById('gradeNote').value=note;openModal('modalGrade');}
 
 async function saveGrade(){
@@ -1703,8 +1790,8 @@ function renderAvailableExams(){
     const myRes=allResults.filter(r=>r.student_id===currentUser.id&&r.exam_id===e.id);
     const best=myRes.filter(r=>r.graded!==false).length?Math.max(...myRes.filter(r=>r.graded!==false).map(r=>r.score)):null;
     const sched=allSchedules.find(s=>s.exam_id===e.id&&new Date(s.opens_at)<=now&&new Date(s.closes_at)>=now);
-    const doneToday=myRes.some(r=>(r.submitted_at||'').slice(0,10)===todayStr());
-    const pendingMine=myRes.some(r=>r.graded===false);
+    const doneToday=myRes.length>0;
+    const pendingMine=myRes.some(r=>r.graded===false&&r.admin_note!==STARTED_NOTE);
     return `<div class="card" style="border-top:4px solid ${borders[idx%6]};background:${bgs[idx%6]}">
       <div style="font-size:36px;margin-bottom:10px">${icons[idx%6]}</div>
       <div class="card-title">${e.title}</div>
@@ -1714,7 +1801,7 @@ function renderAvailableExams(){
       ${pendingMine?`<div class="alert alert-info" style="margin-bottom:10px;font-size:12px">⏳ A previous result is pending grading</div>`:''}
       ${best!==null?`<div class="alert alert-info" style="margin-bottom:10px;font-size:12px">Best score: <strong>${Math.round(best)}%</strong></div>`:''}
       ${doneToday
-        ?`<button class="btn btn-ghost" disabled style="cursor:not-allowed;opacity:.6">✅ Completed today</button>`
+        ?`<button class="btn btn-ghost" disabled style="cursor:not-allowed;opacity:.6">✅ Already taken</button>`
         :`<button class="btn btn-primary" onclick="startExam('${e.id}')">Start Exam →</button>`
       }
     </div>`;
@@ -1722,12 +1809,21 @@ function renderAvailableExams(){
 }
 
 // ── EXAM FLOW ─────────────────────────────────
-function startExam(examId){
+const STARTED_NOTE='⚠️ Started but not submitted';
+let activeResultId=null;
+async function startExam(examId){
   const exam=allExams.find(e=>e.id===examId);
   if(!exam||!(exam.questions||[]).length){alert('This exam has no questions yet.');return;}
-  const doneToday=allResults.some(r=>r.student_id===currentUser.id&&r.exam_id===examId&&(r.submitted_at||'').slice(0,10)===todayStr());
-  if(doneToday){alert('You have already taken this exam today. You can try again tomorrow.');return;}
-  if(!confirm(`Start "${exam.title}"?\n⏱ Duration: ${exam.duration_minutes} minutes\n❓ Questions: ${exam.questions.length}\n\nYou can only take this exam once today.`))return;
+  if(allResults.some(r=>r.student_id===currentUser.id&&r.exam_id===examId)){alert('You have already taken this exam. It can only be taken once.');return;}
+  if(!confirm(`Start "${exam.title}"?\n⏱ Duration: ${exam.duration_minutes} minutes\n❓ Questions: ${exam.questions.length}\n\n⚠️ You can enter this exam ONLY ONCE. Do not close or refresh the page until you submit.`))return;
+  showLoading('Starting exam…');
+  try{
+    const res=await sb('results',{method:'POST',body:JSON.stringify({student_id:currentUser.id,exam_id:examId,score:null,answers:{},audio_answers:{},time_used_seconds:0,passed:null,graded:false,pending_manual:[],earned_points:0,total_points:0,submitted_at:new Date().toISOString(),attempt_date:todayStr(),admin_note:STARTED_NOTE})});
+    const d=await res.json();
+    if(!res.ok||!d[0])throw new Error(d.message||'save failed');
+    activeResultId=d[0].id;allResults.unshift(d[0]);
+  }catch(e){hideLoading();alert('Could not start the exam. Check your connection and try again.');return;}
+  hideLoading();
   activeExam=exam;answers={};audioAnswers={};questionIndex=0;lastResult=null;
   timeLeft=exam.duration_minutes*60;examStartTime=Date.now();
   document.getElementById('examName').textContent=exam.title;
@@ -1845,12 +1941,12 @@ async function submitExam(timeUp){
   const score=graded?(totalPoints?(earnedPoints/totalPoints)*100:0):null;
   const passed=graded?score>=(activeExam.passing_score||60):null;
   showLoading('Submitting…');
-  await sb('results',{method:'POST',body:JSON.stringify({
-    student_id:currentUser.id,exam_id:activeExam.id,score,answers,audio_answers:audioAnswers,
+  const payload={student_id:currentUser.id,exam_id:activeExam.id,score,answers,audio_answers:audioAnswers,
     time_used_seconds:timeUsed,passed,graded,pending_manual:pendingManual,
     earned_points:earnedPoints,total_points:totalPoints,
-    submitted_at:new Date().toISOString(),attempt_date:todayStr()
-  })});
+    submitted_at:new Date().toISOString(),attempt_date:todayStr(),admin_note:null};
+  await sb(activeResultId?`results?id=eq.${activeResultId}`:'results',{method:activeResultId?'PATCH':'POST',body:JSON.stringify(payload)});
+  activeResultId=null;
   lastResult={score,correct,total,passed,timeUsed,graded,examTitle:activeExam.title};
   await loadAllData();hideLoading();
   showResultPage(score,correct,total,passed,graded);
@@ -2171,7 +2267,7 @@ function toggleAssignAll(){
 // ── TABS ──────────────────────────────────────
 function showAdminTab(tab){showPage('page-admin');switchAdminTab(tab);}
 function switchAdminTab(tab){
-  const tabs=['students','bank','exams','schedule','results','discounts','reports'];
+  const tabs=['students','bank','exams','schedule','results','discounts','reports','ratings'];
   tabs.forEach(t=>{
     const el=document.getElementById(`adminTab-${t}`);if(el)el.style.display=t===tab?'block':'none';
     const b=document.getElementById(`tabBtn-${t}`);if(b)b.classList.toggle('active',t===tab);
@@ -2183,11 +2279,12 @@ function switchAdminTab(tab){
   if(tab==='results'){populateDropdowns();renderResultsTable();}
   if(tab==='discounts'){populateDropdowns();renderDiscountsTable();}
   if(tab==='reports')populateDropdowns();
+  if(tab==='ratings')renderRatings('adminRatingsList');
 }
 
 function showTeacherTab(tab){showPage('page-teacher');switchTeacherTab(tab);}
 function switchTeacherTab(tab){
-  const tabs=['bank','exams','results'];
+  const tabs=['bank','exams','results','ratings'];
   tabs.forEach(t=>{
     const el=document.getElementById(`teacherTab-${t}`);if(el)el.style.display=t===tab?'block':'none';
     const b=document.getElementById(`teacherTabBtn-${t}`);if(b)b.classList.toggle('active',t===tab);
@@ -2195,6 +2292,7 @@ function switchTeacherTab(tab){
   if(tab==='bank'){populateDropdowns();renderTeacherBankList();}
   if(tab==='exams'){populateDropdowns();renderTeacherExamList();}
   if(tab==='results')renderTeacherResultsTable();
+  if(tab==='ratings')renderRatings('teacherRatingsList',currentUser.id);
 }
 
 // ── NAVIGATION & MODALS ───────────────────────
