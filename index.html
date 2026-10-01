@@ -253,12 +253,13 @@
 <!-- HEADER -->
 <div id="mainHeader" style="display:none">
   <div class="header">
-    <div class="logo-area">
+    <div class="logo-area" onclick="goHome()" style="cursor:pointer" title="Home">
       <img src="logo.jpeg" alt="MY Institute" onerror="this.style.display='none'"/>
       <div><div class="logo-text">MY Institute</div><div class="logo-sub">Exam Portal</div></div>
     </div>
     <div class="header-right">
       <div class="user-badge" id="headerUser">—</div>
+      <button class="btn-sm" id="headerHomeBtn" onclick="goHome()">🏠 Home</button>
       <button class="btn-sm" id="headerProfileBtn" onclick="showPage('page-profile')" style="display:none">👤 My Profile</button>
       <button class="btn-sm" id="headerTeacherBtn" onclick="showPage('page-teacher')" style="display:none">📚 Teacher Panel</button>
       <button class="btn-sm" id="headerAdminBtn" onclick="showPage('page-admin')" style="display:none">⚙️ Admin</button>
@@ -590,7 +591,7 @@
         </div>
       </div>
       <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap">
-        <button class="btn btn-outline" onclick="showPage('page-home')" style="flex:1">🏠 Home</button>
+        <button class="btn btn-outline" onclick="goHome()" style="flex:1">🏠 Home</button>
         <button class="btn btn-ghost" id="reviewBtn" onclick="startReview()" style="flex:1">📖 Review</button>
       </div>
     </div>
@@ -2633,6 +2634,12 @@ function switchTeacherTab(tab){
 }
 
 // ── NAVIGATION & MODALS ───────────────────────
+function goHome(){
+  if(!currentUser)return;
+  if(document.getElementById('page-exam').classList.contains('active')){alert('Please finish and submit your exam first.');return;}
+  showPage('page-home');renderLeaderboard();updateAdminStats();
+  if(currentUser.role==='student'){renderNotifBanner();renderAvailableExams();}
+}
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');window.scrollTo(0,0);
